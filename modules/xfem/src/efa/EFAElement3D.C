@@ -1023,6 +1023,9 @@ EFAElement3D::createChild(const std::set<EFAElement *> & CrackTipElements,
       EFAPoint normal(0.0, 0.0, 0.0);
       EFAPoint orig(0.0, 0.0, 0.0);
 
+      std::vector<EFAPoint> normal_v;
+      std::vector<EFAPoint> orig_v;
+
       if (cut_plane_nodes.size())
       {
         for (unsigned int i = 0; i < cut_plane_nodes[0].size(); ++i)
@@ -1040,6 +1043,7 @@ EFAElement3D::createChild(const std::set<EFAElement *> & CrackTipElements,
           }
           cut_plane_points.push_back(coor);
         }
+
         for (unsigned int i = 0; i < cut_plane_points.size(); ++i)
           orig += cut_plane_points[i];
         orig /= cut_plane_points.size();
@@ -1051,13 +1055,32 @@ EFAElement3D::createChild(const std::set<EFAElement *> & CrackTipElements,
 
         for (unsigned int i = 0; i < cut_plane_points.size(); ++i)
         {
+          int iplus1 = i < cut_plane_points.size() - 1 ? i + 1 : 0;
+          int iplus2 = i + 2;
+          if (iplus2 + 2 - cut_plane_points.size() >= 0)
+            iplus2 = iplus2 + 2 - cut_plane_points.size();
+
+          EFAPoint center(0.0, 0.0, 0.0);
+
+          center = cut_plane_points[i] + cut_plane_points[iplus1] + cut_plane_points[iplus2];
+          center /= 3;
+
+          orig_v.push_back((center));
+        }
+
+        for (unsigned int i = 0; i < cut_plane_points.size(); ++i)
+        {
           unsigned int iplus1 = i < cut_plane_points.size() - 1 ? i + 1 : 0;
-          EFAPoint ray1 = cut_plane_points[i] - center;
-          EFAPoint ray2 = cut_plane_points[iplus1] - center;
+          EFAPoint ray1 = cut_plane_points[i] - orig;
+          EFAPoint ray2 = cut_plane_points[iplus1] - orig;
           normal += ray1.cross(ray2);
+          normal_v.push_back(ray1.cross(ray2));
         }
         normal /= cut_plane_points.size();
         Xfem::normalizePoint(normal);
+
+        for (unsigned int i = 0; i < normal_v.size(); ++i)
+          Xfem::normalizePoint(normal_v[i]);
       }
 
       // get child element's nodes
@@ -1066,11 +1089,41 @@ EFAElement3D::createChild(const std::set<EFAElement *> & CrackTipElements,
         EFAPoint p(0.0, 0.0, 0.0);
         p = _local_node_coor[j];
         EFAPoint origin_to_point = p - orig;
+
+        bool use_temp = false;
+        for (unsigned int k = 0; k < normal_v.size(); ++k)
+          if (origin_to_point * normal_v[k] > Xfem::tol)
+          {
+            use_temp = true;
+            break;
+          }
+
+        // std::cout << "orig = " << orig(0) << ", " << orig(1) << ", " << orig(2) << std::endl;
+        // std::cout << "node " << j << " temp? " << use_temp << std::endl;
+        // for (unsigned int i = 0; i < normal_v.size(); ++i)
+        //   std::cout << i << ", "
+        //             << "prod = " << origin_to_point * normal_v[i] << ", normal = " <<
+        //             normal_v[i](0)
+        //             << ", " << normal_v[i](1) << ", " << normal_v[i](2) << std::endl;
+
+        // if (use_temp)
+        // {
+        //   std::cout << "orig = " << orig(0) << ", " << orig(1) << ", " << orig(2) << std::endl;
+        //   for (unsigned int i = 0; i < normal_v.size(); ++i)
+        //     std::cout << i << ", "
+        //               << "prod = " << origin_to_point * normal_v[i]
+        //               << ", normal = " << normal_v[i](0) << ", " << normal_v[i](1) << ", "
+        //               << normal_v[i](2) << std::endl;
+        // }
+
         if (_fragments.size() == 1 && !shouldDuplicateForCrackTip(CrackTipElements))
           childElem->setNode(j, _nodes[j]); // inherit parent's node
-        else if (origin_to_point * normal < Xfem::tol)
+        // else if (origin_to_point * normal < Xfem::tol)
+        else if (!use_temp)
+        {
           childElem->setNode(j, _nodes[j]); // inherit parent's node
-        else                                // parent element's node is not in fragment
+        }
+        else // parent element's node is not in fragment
         {
           unsigned int new_node_id = Efa::getNewID(TempNodes);
           EFANode * newNode = new EFANode(new_node_id, EFANode::N_CATEGORY_TEMP, _nodes[j]);
@@ -1139,6 +1192,7 @@ EFAElement3D::removePhantomEmbeddedNode()
 void
 EFAElement3D::connectNeighbors(std::map<unsigned int, EFANode *> & PermanentNodes,
                                std::map<unsigned int, EFANode *> & TempNodes,
+                               std::set<unsigned int> & ReplacedNodes,
                                std::map<EFANode *, std::set<EFAElement *>> & InverseConnectivityMap,
                                bool merge_phantom_faces)
 {
@@ -1181,8 +1235,14 @@ EFAElement3D::connectNeighbors(std::map<unsigned int, EFANode *> & PermanentNode
 
               EFANode * childNode = _faces[j]->getNode(childNodeIndex);
               EFANode * childOfNeighborNode = neighborChildFace->getNode(neighborChildNodeIndex);
-              mergeNodes(
-                  childNode, childOfNeighborNode, childOfNeighborElem, PermanentNodes, TempNodes);
+
+              mergeNodes(childNode,
+                         childOfNeighborNode,
+                         childOfNeighborElem,
+                         PermanentNodes,
+                         TempNodes,
+                         ReplacedNodes);
+
             } // i
 
             for (unsigned int m = 0; m < _num_interior_face_nodes; ++m)
@@ -1194,8 +1254,13 @@ EFAElement3D::connectNeighbors(std::map<unsigned int, EFANode *> & PermanentNode
               EFANode * childNode = _faces[j]->getInteriorFaceNode(childNodeIndex);
               EFANode * childOfNeighborNode =
                   neighborChildFace->getInteriorFaceNode(neighborChildNodeIndex);
-              mergeNodes(
-                  childNode, childOfNeighborNode, childOfNeighborElem, PermanentNodes, TempNodes);
+
+              mergeNodes(childNode,
+                         childOfNeighborNode,
+                         childOfNeighborElem,
+                         PermanentNodes,
+                         TempNodes,
+                         ReplacedNodes);
             } // m
           }
         } // l, loop over NeighborElem's children
@@ -1238,7 +1303,9 @@ EFAElement3D::connectNeighbors(std::map<unsigned int, EFANode *> & PermanentNode
                              childOfNeighborNode,
                              childOfNeighborElem,
                              PermanentNodes,
-                             TempNodes);
+                             TempNodes,
+                             ReplacedNodes);
+
               } // i
             }
           } // loop over NeighborElem's children

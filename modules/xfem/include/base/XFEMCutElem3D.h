@@ -47,6 +47,10 @@ public:
   virtual void computeMomentFittingWeights();
   virtual Point getCutPlaneOrigin(unsigned int plane_id, MeshBase * displaced_mesh = NULL) const;
   virtual Point getCutPlaneNormal(unsigned int plane_id, MeshBase * displaced_mesh = NULL) const;
+  virtual Real getCutPlaneArea() const;
+  virtual void getCutPlaneNormals(unsigned int plane_id,
+                                  std::vector<Point> & normals,
+                                  MeshBase * displaced_mesh = NULL) const;
   virtual void
   getCrackTipOriginAndDirection(unsigned tip_id, Point & origin, Point & direction) const;
   virtual void getFragmentFaces(std::vector<std::vector<Point>> & frag_faces,

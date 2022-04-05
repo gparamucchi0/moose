@@ -300,9 +300,8 @@ template <typename OutputType>
 const typename MooseVariableDataBase<OutputType>::FieldVariableValue &
 MooseVariableDataBase<OutputType>::sln(Moose::SolutionState state) const
 {
-  auto functor = [this](TagID tag_id) -> const FieldVariableValue & {
-    return vectorTagValue(tag_id);
-  };
+  auto functor = [this](TagID tag_id) -> const FieldVariableValue &
+  { return vectorTagValue(tag_id); };
 
   return const_cast<MooseVariableDataBase<OutputType> *>(this)
       ->stateToTagHelper<FieldVariableValue>(state, functor);
@@ -312,9 +311,8 @@ template <typename OutputType>
 const typename MooseVariableDataBase<OutputType>::FieldVariableGradient &
 MooseVariableDataBase<OutputType>::gradSln(Moose::SolutionState state) const
 {
-  auto functor = [this](TagID tag_id) -> const FieldVariableGradient & {
-    return vectorTagGradient(tag_id);
-  };
+  auto functor = [this](TagID tag_id) -> const FieldVariableGradient &
+  { return vectorTagGradient(tag_id); };
 
   return const_cast<MooseVariableDataBase<OutputType> *>(this)
       ->stateToTagHelper<FieldVariableGradient>(state, functor);
