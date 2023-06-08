@@ -73,8 +73,8 @@ InterfaceMeshCutUserObjectBase::initialSetup()
   }
 
   for (const auto & node : _cutter_mesh->node_ptr_range())
-    _initial_nodes_location[node->id()] = *node;
-
+    _initial_nodes_location[node->id()] = *node;  //is this where I should modify the function 
+                                                  //and put is C4 is expcomp oxa interface 
   for (const auto & elem : _cutter_mesh->element_ptr_range())
     for (unsigned int n = 0; n < elem->n_nodes(); n++)
       _node_to_elem_map[elem->node_id(n)].push_back(elem->id());
