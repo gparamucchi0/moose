@@ -63,6 +63,8 @@ public:
 
   unsigned int numberNodes() const { return _nodes.size(); };
 
+  Point getPointCurrentLocation(unsigned int i) const;
+  
 protected:
   /**
    * Find the element in the element pairs that contains the point in its physical domain.

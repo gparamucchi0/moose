@@ -28,7 +28,7 @@ XFEMC4VelocityZrAB::XFEMC4VelocityZrAB(const InputParameters & parameters)
 }
 
 Real
-XFEMC4VelocityZrAB::computeMovingInterfaceVelocity(dof_id_type point_id, RealvectorValue normal) const
+XFEMC4VelocityZrAB::computeMovingInterfaceVelocity(dof_id_type point_id, RealVectorValue normal) const
 {
   RealVectorValue grad_positive = _value_at_interface_uo->getGradientAtPositiveLevelSet()[point_id]; //replace with node_id ?
   RealVectorValue grad_negative = _value_at_interface_uo->getGradientAtNegativeLevelSet()[point_id];  //replace with node-id ?
