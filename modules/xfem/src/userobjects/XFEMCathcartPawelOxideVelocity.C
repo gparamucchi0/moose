@@ -37,7 +37,7 @@ XFEMCathcartPawelOxideVelocity::XFEMCathcartPawelOxideVelocity(
 
 Real
 XFEMCathcartPawelOxideVelocity::computeMovingInterfaceVelocity(
-    dof-id_type point_id, RealVectorValue normal) const
+    dof_id_type point_id, RealVectorValue normal) const
 {
   //Real value_positive = _value_at_interface_uo->getValueAtPositiveLevelSet()[point_id];
   //Real value_negative = _value_at_interface_uo->getValueAtNegativeLevelSet()[point_id];
