@@ -33,7 +33,7 @@ public:
   XFEMC4VelocityZero(const InputParameters & parameters);
   virtual ~XFEMC4VelocityZero() {}
 
-  virtual Real computeMovingInterfaceVelocity(dof_id_type point_id, RealVectorvalue normal) const override;
+  virtual Real computeMovingInterfaceVelocity(dof_id_type point_id, RealVectorValue normal) const override;
 
 
 protected:
