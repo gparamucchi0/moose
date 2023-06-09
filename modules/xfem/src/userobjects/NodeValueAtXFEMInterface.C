@@ -60,6 +60,12 @@ NodeValueAtXFEMInterface::initialize()
   _elem_pairs = _xfem->getXFEMCutElemPairs(_xfem->getGeometricCutID(_mesh_cut));
 }
 
+Point
+NodeValueAtXFEMInterface::getPointCurrentLocation(unsigned int i) const
+{
+  return _nodes[i];
+};
+
 void
 NodeValueAtXFEMInterface::execute()
 {
