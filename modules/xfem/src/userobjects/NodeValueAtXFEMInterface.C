@@ -119,6 +119,18 @@ NodeValueAtXFEMInterface::execute()
       _grad_values_negative_level_set_side[i] = RealVectorValue(0);
     }
   }
+  //Take the average o the x position to return the posisition of the interface 
+  std::list<double> Xcomps;
+  double sum = 0;
+  for ( auto & node : cutter_mesh->node_ptr_range())
+  {
+   Xcomps.push_back(node->operator()(0));
+  }
+  for (double Xcomp : Xcomps)
+  {
+    sum += Xcomp;
+  }
+  _current_pos = sum / Xcomps.size(); 
 }
 
 void
