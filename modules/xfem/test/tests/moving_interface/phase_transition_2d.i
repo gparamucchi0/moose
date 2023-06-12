@@ -43,7 +43,8 @@
     interface_velocity_uo = velocity
     heal_always = true
     is_C4 = true
-    ab_interface = true
+    oxa_interface = true
+
   []
 []
 
