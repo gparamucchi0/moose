@@ -7,10 +7,10 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 11
+    nx = 200
     ny = 1
     xmin = 0.0
-    xmax = 20.0
+    xmax = 2000.0
     ymin = 0.0
     ymax = 5.0
     elem_type = QUAD4
@@ -38,10 +38,12 @@
     level_set_var = ls
   []
   [cut_mesh]
-    type = InterfaceMeshCut2DUserObject
+    type = InterfaceMeshCut2DUserObjectZr
     mesh_file = flat_interface_1d.e
     interface_velocity_uo = velocity
     heal_always = true
+    is_C4 = true
+    ab_interface = true
   []
 []
 

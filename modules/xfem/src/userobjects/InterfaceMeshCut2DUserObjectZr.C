@@ -60,6 +60,7 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
     _interface_velocity = dynamic_cast<const XFEMMovingInterfaceVelocityBase *>(uo);
     const_cast<XFEMMovingInterfaceVelocityBase *>(_interface_velocity)->initialize();
   }
+   
   //Check if C4 model 
   if (_is_C4)
   {
@@ -72,7 +73,7 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
       }
       else
       {
-        x_a_b = 594;
+        x_a_b = 600;//594
       }
 
         //Real x_a_b = 541.7;
@@ -104,10 +105,19 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
       {
         x_a_b = -1.9259*1e-7*pow(_temperature,3) + 6.7254*1e-4*pow(_temperature,2) - 0.84697*_temperature + 977.01  ;
       }
-      */
+      
      for (auto & node : _cutter_mesh->node_ptr_range())
      {
-      node[0]=x_a_b;
+      //std::cout << node[0] << std:endl
+      for (auto & Node : node)
+      {
+       Node->assign(const TypeVector<double> p =(x_a_b, Node[1], Node[2]));
+      }
+      //std::cout << x_a_b << std::endl
+     }*/
+     for (auto & node : _cutter_mesh->node_ptr_range())
+     {
+      node->operator()(0) += - node[0](0) + x_a_b;
      }
     }
     if (_oxa_interface)
@@ -150,10 +160,17 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
       {
         x_ox_a = -3.6071*1e-5*pow(_temperature,2) + 7.1427*1e-2*_temperature + 563.11  ;
       }
-      */
+      
      for (auto & node : _cutter_mesh->node_ptr_range())
      {
-      node[0]=x_ox_a;
+      for (auto & Node : node)
+      {
+       Node->assign(const TypeVector<double> p =(x_ox_a, Node[1], Node[2]));
+      }
+     }*/
+     for (auto & node : _cutter_mesh->node_ptr_range())
+     {
+      node->operator()(0) += - node[0](0) + x_ox_a;
      }
     }
 
