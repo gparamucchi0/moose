@@ -155,7 +155,9 @@ InterfaceMeshCutUserObjectBase::initialize()
     new_position[node->id()] = p;
   }
   for (const auto & node : _cutter_mesh->node_ptr_range())
-    _cutter_mesh->node_ref(node->id()) = new_position[node->id()];
+    {_cutter_mesh->node_ref(node->id()) = new_position[node->id()];
+    std::string info = node->get_info();
+    std::cout << info;}
 
   if (_output_exodus)
   {

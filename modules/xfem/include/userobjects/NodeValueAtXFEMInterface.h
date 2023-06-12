@@ -65,6 +65,8 @@ public:
 
   Point getPointCurrentLocation(unsigned int i) const;
   
+  Real getCurrentpos() const { return _current_pos; };
+  
 protected:
   /**
    * Find the element in the element pairs that contains the point in its physical domain.
@@ -116,4 +118,7 @@ protected:
 
   /// Mapping from point index and its gradient at the negative level set side
   std::map<unsigned int, RealVectorValue> _grad_values_negative_level_set_side;
+
+  ///Point current position (avg value)
+  double _current_pos;
 };
