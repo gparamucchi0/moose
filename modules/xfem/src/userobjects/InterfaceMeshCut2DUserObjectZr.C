@@ -129,7 +129,7 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
       }
       else
       {
-        x_ox_a =301;
+        x_ox_a =598.0;
       }
       //Real x_ox_a = 577.9;
 /**      if (MooseUtils::absoluteFuzzyEqual(_temperature,1273.15,1))
@@ -177,8 +177,9 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
   }
   for (const auto & node : _cutter_mesh->node_ptr_range())
     {_initial_nodes_location[node->id()] = *node;  
-    std::string info = node->get_info();
-    std::cout << info;}                                             
+    //std::string info = node->get_info();
+    //std::cout << info;
+    }                                             
   for (const auto & elem : _cutter_mesh->element_ptr_range())
     for (unsigned int n = 0; n < elem->n_nodes(); n++)
       _node_to_elem_map[elem->node_id(n)].push_back(elem->id());
