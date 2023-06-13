@@ -39,7 +39,7 @@ NodeValueAtXFEMInterface::NodeValueAtXFEMInterface(const InputParameters & param
         _subproblem.getVariable(_tid, parameters.get<VariableName>("level_set_var")).number()),
     _system(_subproblem.getSystem(getParam<VariableName>("level_set_var"))),
     _solution(*_system.current_local_solution.get())
-{
+{  
 }
 
 void
@@ -56,15 +56,11 @@ NodeValueAtXFEMInterface::initialize()
   if (dynamic_cast<const InterfaceMeshCutUserObjectBase *>(uo) == nullptr)
     mooseError("UserObject casting to InterfaceMeshCutUserObjectBase in NodeValueAtXFEMInterface");
 
+  
   _mesh_cut = dynamic_cast<const InterfaceMeshCutUserObjectBase *>(uo);
   _elem_pairs = _xfem->getXFEMCutElemPairs(_xfem->getGeometricCutID(_mesh_cut));
-}
 
-Point
-NodeValueAtXFEMInterface::getPointCurrentLocation(unsigned int i) const
-{
-  return _nodes[i];
-};
+}
 
 void
 NodeValueAtXFEMInterface::execute()
@@ -142,6 +138,12 @@ NodeValueAtXFEMInterface::finalize()
   _communicator.set_union(_grad_values_negative_level_set_side);
 }
 
+/*Point
+NodeValueAtXFEMInterface::getPointCurrentLocation(unsigned int i) const
+{
+  return _nodes[i];
+};
+*/
 const Elem *
 NodeValueAtXFEMInterface::getElemContainingPoint(const Node & p, bool positive_level_set)
 {

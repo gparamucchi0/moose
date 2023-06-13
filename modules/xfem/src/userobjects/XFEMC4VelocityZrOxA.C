@@ -33,7 +33,7 @@ XFEMC4VelocityZrOxA::computeMovingInterfaceVelocity(dof_id_type point_id, RealVe
   RealVectorValue grad_positive = _value_at_interface_uo->getGradientAtPositiveLevelSet()[point_id]; 
   RealVectorValue grad_negative = _value_at_interface_uo->getGradientAtNegativeLevelSet()[point_id]; 
 
-  Real xt = (_value_at_interface_uo->getPointCurrentLocation(0))(0); //replace with GetNodeCurrentLocation ?
+  Real xt = _value_at_interface_uo->getCurrentpos(); //replace with GetNodeCurrentLocation ?
 
   //  std::cout << "point_id: " << point_id << std::endl;
 

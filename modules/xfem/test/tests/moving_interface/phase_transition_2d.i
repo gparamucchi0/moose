@@ -137,6 +137,16 @@
   []
 []
 
+#[Postprocessors]
+ # [position]
+ #   type = PositionOfXFEMInterfacePostprocessor
+ #   value_at_interface_uo = value_uo
+ #   execute_on = 'timestep_end final'
+ # []
+#[]
+#
+
+
 [Executioner]
   type = Transient
   solve_type = 'PJFNK'
