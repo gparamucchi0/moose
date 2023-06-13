@@ -63,7 +63,7 @@ public:
 
   unsigned int numberNodes() const { return _nodes.size(); };
 
-  Point getPointCurrentLocation(unsigned int i) const;
+  //Point getPointCurrentLocation(unsigned int i) const;
   
   Real getCurrentpos() const { return _current_pos; };
   

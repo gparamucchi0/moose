@@ -13,7 +13,7 @@
 #include "XFEM.h"
 
 
-registerMooseObject("XFEMApp", XFEMEqualValueAtInterface);
+registerMooseObject("XFEMApp", XFEMEqualValueAtInterfaceC4ab);
 
 InputParameters
 XFEMEqualValueAtInterfaceC4ab::validParams()

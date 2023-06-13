@@ -31,7 +31,7 @@ XFEMC4VelocitySteelOx::computeMovingInterfaceVelocity(dof_id_type point_id, Real
   //RealVectorValue grad_positive = _value_at_interface_uo->getGradientAtPositiveLevelSet()[point_id];
   //RealVectorValue grad_negative = _value_at_interface_uo->getGradientAtNegativeLevelSet()[point_id];
 
-  Real xt = (_value_at_interface_uo->getPointCurrentLocation(point_id))(0);
+  Real xt = (_value_at_interface_uo->getCurrentpos());
 
   //Oxide thickness [µm]
   Real delta = std::abs(xt - 5);
