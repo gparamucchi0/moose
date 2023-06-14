@@ -232,18 +232,18 @@
   []
 []
 
-[VectorPostprocessors]
-  [O_profile]
-    type = LineValueSampler
-    use_displaced_mesh = false
-    start_point = '600 2 0'
-    end_point = '0 2 0'
-    sort_by = x
-    num_points = 601
-    outputs = csv
-    variable = 'u'
-  []
-[]
+#[VectorPostprocessors]
+#  [O_profile]
+#    type = LineValueSampler
+#    use_displaced_mesh = false
+#    start_point = '600 2 0'
+#    end_point = '0 2 0'
+#    sort_by = x
+#    num_points = 601
+#    outputs = csv
+#    variable = 'u'
+#  []
+#[]
 
 [Executioner]
   type = Transient
@@ -260,7 +260,7 @@
   nl_rel_tol = 1e-6
   nl_abs_tol = 1e-6
 
-  start_time = 0.0
+  start_time = -0.5
   dt = 0.5
   num_steps = 601
   max_xfem_update = 1
@@ -275,6 +275,6 @@
   #  type = Console
   #  output_linear = true
   #[]
-  csv = true
+  #csv = true
   perf_graph = true
 []
