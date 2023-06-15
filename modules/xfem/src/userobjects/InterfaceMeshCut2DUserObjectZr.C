@@ -73,7 +73,7 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
       }
       else
       {
-        x_a_b = 594;//594
+        x_a_b = 572;//594
       }
 
         //Real x_a_b = 541.7;
@@ -129,7 +129,7 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
       }
       else
       {
-        x_ox_a =598.0;
+        x_ox_a =590.0;
       }
       //Real x_ox_a = 577.9;
 /**      if (MooseUtils::absoluteFuzzyEqual(_temperature,1273.15,1))
