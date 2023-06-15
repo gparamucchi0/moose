@@ -44,7 +44,7 @@ XFEMPhaseTransitionMovingInterfaceVelocity::computeMovingInterfaceVelocity(
   RealVectorValue grad_positive = _value_at_interface_uo->getGradientAtPositiveLevelSet()[point_id];
   RealVectorValue grad_negative = _value_at_interface_uo->getGradientAtNegativeLevelSet()[point_id];
 
-  return std::abs(10*(_diffusivity_at_positive_level_set * grad_positive -
+  return std::abs(1*(_diffusivity_at_positive_level_set * grad_positive -
                    _diffusivity_at_negative_level_set * grad_negative) *
                   normal / (value_positive - value_negative + _equilibrium_concentration_jump));
 }

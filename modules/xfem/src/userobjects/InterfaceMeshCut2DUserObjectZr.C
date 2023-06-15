@@ -28,8 +28,6 @@ InterfaceMeshCut2DUserObjectZr::validParams()
   params.addClassDescription("A userobject to cut a 2D mesh using a 1D cutter mesh.");
   //return params
   return params;
- 
-
 }
 
 InterfaceMeshCut2DUserObjectZr::InterfaceMeshCut2DUserObjectZr(const InputParameters & parameters)

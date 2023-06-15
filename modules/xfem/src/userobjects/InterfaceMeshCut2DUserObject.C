@@ -29,6 +29,7 @@ InterfaceMeshCut2DUserObject::InterfaceMeshCut2DUserObject(const InputParameters
           "InterfaceMeshCut2DUserObject currently only supports EDGE2 element in the cut mesh.");
 }
 
+
 void
 InterfaceMeshCut2DUserObject::calculateNormals()
 {
