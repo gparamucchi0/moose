@@ -20,11 +20,12 @@ InterfaceMeshCut3DUserObjectZr::validParams()
   //required parameters
   //ONLY PUT A 2D CYLINDER MESH TALLER THAN THE MESH OTHERWISE IT WOULD BE A CRACK
   //optionnal parameters from the C4 model
-  /*params.addParam<bool>("is_C4",false,"Boolean specifying if the object is used for the C4 model");
+  params.addParam<bool>("is_C4",false,"Boolean specifying if the object is used for the C4 model");
   params.addParam<bool>("is_expcomp",false,"Boolean specifying if the object is used for comparing model with UW-MIT experiment");
   params.addParam<bool>("ab_interface",false,"Boolean specifying if the object is used for alpha/beta interface.");
   params.addParam<bool>("oxa_interface",false,"Boolean specifying if the object is used for oxide/alpha interface.");
-  params.addParam<Real>("temperature",1473.15,"Temperature of the cladding [K]. Homogeneous temperature only.");*/
+  params.addParam<Real>("temperature",1473.15,"Temperature of the cladding [K]. Homogeneous temperature only.");
+  params.addParam<Real>("clad_rad",49700,"Inner radius of the cladding [um]. Needed for intial setup of the mesh");
   //class description
   params.addClassDescription("A userobject to cut a 3D mesh using a 2D cutter mesh.");
   //return params 
@@ -32,11 +33,12 @@ InterfaceMeshCut3DUserObjectZr::validParams()
 }
 
 InterfaceMeshCut3DUserObjectZr::InterfaceMeshCut3DUserObjectZr(const InputParameters & parameters)
-  : InterfaceMeshCut3DUserObject(parameters)/*, _is_C4(getParam<bool>("is_C4")),
+  : InterfaceMeshCut3DUserObject(parameters), _is_C4(getParam<bool>("is_C4")),
     _is_expcomp(getParam<bool>("is_expcomp")),
     _ab_interface(getParam<bool>("ab_interface")),
     _oxa_interface(getParam<bool>("oxa_interface")),
-    _temperature(getParam<Real>("temperature"))*/
+    _temperature(getParam<Real>("temperature")),
+    _R_clad(getParam<Real>("clad_rad"))
 {
   for (const auto & elem : _cutter_mesh->element_ptr_range())
     if (elem->type() != TRI3)
@@ -44,8 +46,8 @@ InterfaceMeshCut3DUserObjectZr::InterfaceMeshCut3DUserObjectZr(const InputParame
                  "cutting mesh.");
 }
 
-/*void
-InterfaceMeshCut2DUserObjectZr::initialSetup()
+void
+InterfaceMeshCut3DUserObjectZr::initialSetup()
 {
   if (_func == nullptr)
   {
@@ -113,11 +115,21 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
        Node->assign(const TypeVector<double> p =(x_a_b, Node[1], Node[2]));
       }
       //std::cout << x_a_b << std::endl
-     }
+     }*/
      for (auto & node : _cutter_mesh->node_ptr_range())
      {
-      node->operator()(0) /= (node[0](0) / x_ox_a);
-      node->operator()(1) /= (node[0](1) / x_ox_a);
+      //std::cout << "Node [0](0):" << node[0](0) << std::endl;
+      //std::cout << "Node [0](1):" << node[0](1) << std::endl;
+      if (!((node[0](0) == 0) && (node[0](1) == 0)))
+      {
+        node->operator()(0) /= (std::sqrt(pow(node[0](0),2) + pow(node[0](1),2)) / (_R_clad + x_a_b));
+        node->operator()(1) /= (std::sqrt(pow(node[0](0),2) + pow(node[0](1),2)) / (_R_clad + x_a_b));
+      }
+      else
+      {
+        mooseError("Cylinder interface mesh not set up properly"
+                   "A mesh nodes is at (0,0)");
+      }
      }
     }
     if (_oxa_interface)
@@ -132,7 +144,7 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
         x_ox_a =590.0;
       }
       //Real x_ox_a = 577.9;
-/**      if (MooseUtils::absoluteFuzzyEqual(_temperature,1273.15,1))
+      /** if (MooseUtils::absoluteFuzzyEqual(_temperature,1273.15,1))
       {
         x_ox_a = 595.6;
       }
@@ -167,11 +179,20 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
       {
        Node->assign(const TypeVector<double> p =(x_ox_a, Node[1], Node[2]));
       }
-     }
+     }*/
      for (auto & node : _cutter_mesh->node_ptr_range())
      {
-      node->operator()(0) /= (node[0](0) / x_ox_a);
-      node->operator()(1) /= (node[0](1) / x_ox_a);
+      if (!((node[0](0) == 0) && (node[0](1) == 0)))
+      {
+        node->operator()(0) /= (std::sqrt(pow(node[0](0),2) + pow(node[0](1),2)) / (_R_clad + x_ox_a));
+        node->operator()(1) /= (std::sqrt(pow(node[0](0),2) + pow(node[0](1),2)) / (_R_clad + x_ox_a)); 
+      }
+      else
+      {
+        mooseError("Cylinder interface mesh not set up properly"
+                   "A mesh nodes is at (0,0)");
+      }
+      
      }
     }
 
@@ -208,7 +229,7 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
     if (_mesh.dimension() == 3)
       _var_num_disp_z = _explicit_system->variable_number("disp_z");
   }
-}*/
+}
 
 void
 InterfaceMeshCut3DUserObjectZr::calculateNormals()

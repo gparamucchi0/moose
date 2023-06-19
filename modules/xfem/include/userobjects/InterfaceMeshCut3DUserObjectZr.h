@@ -36,9 +36,7 @@ public:
 
   InterfaceMeshCut3DUserObjectZr(const InputParameters & parameters);
   //overriding the initial setup to move the nodes according to the case in 3d mesh / 2d cut cylinder
-  /*virtual void initialSetup() override;*/
-
-  InterfaceMeshCut3DUserObjectZr(const InputParameters & parameters);
+  virtual void initialSetup() override;
 
   virtual bool cutElementByGeometry(const Elem * elem,
                                     std::vector<Xfem::CutEdge> & cut_edges,
@@ -61,10 +59,11 @@ protected:
   /// pseudo normal, three nodes, and three sides
   std::unordered_map<unsigned int, std::array<Point, 7>> _pseudo_normal;
 
-  /*bool _is_C4;
+  bool _is_C4;
   bool _is_expcomp;
   bool _ab_interface;
   bool _oxa_interface;
   
-  Real _temperature;*/
+  Real _temperature;
+  Real _R_clad;
 };
