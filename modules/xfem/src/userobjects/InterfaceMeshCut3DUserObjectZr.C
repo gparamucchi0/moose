@@ -118,12 +118,19 @@ InterfaceMeshCut3DUserObjectZr::initialSetup()
      }*/
      for (auto & node : _cutter_mesh->node_ptr_range())
      {
-      //std::cout << "Node [0](0):" << node[0](0) << std::endl;
+      //std::cout << "Node [0] :" << node[0] << std::endl;
+      //std::cout << "Node components :" << node[0](0) << node[0](1) << std::endl;
+      //std::cout << "Node before:" << node->get_info() << std::endl;
       //std::cout << "Node [0](1):" << node[0](1) << std::endl;
       if (!((node[0](0) == 0) && (node[0](1) == 0)))
       {
-        node->operator()(0) /= (std::sqrt(pow(node[0](0),2) + pow(node[0](1),2)) / (_R_clad + x_a_b));
-        node->operator()(1) /= (std::sqrt(pow(node[0](0),2) + pow(node[0](1),2)) / (_R_clad + x_a_b));
+        auto r = std::sqrt(pow((*node)(0),2) + pow((*node)(1),2));
+        node->operator()(0) /= r/(_R_clad+x_a_b);
+        node->operator()(1) /= r/(_R_clad+x_a_b); 
+
+        // node->operator()(0) /= (std::sqrt(pow((*node)(0),2) + pow((*node)(1),2)) / (_R_clad + x_a_b));
+        // node->operator()(1) /= (std::sqrt(pow((*node)(0),2) + pow((*node)(1),2)) / (_R_clad + x_a_b));
+        //std::cout << "Node after:" << node->get_info() << std::endl;
       }
       else
       {
@@ -184,8 +191,9 @@ InterfaceMeshCut3DUserObjectZr::initialSetup()
      {
       if (!((node[0](0) == 0) && (node[0](1) == 0)))
       {
-        node->operator()(0) /= (std::sqrt(pow(node[0](0),2) + pow(node[0](1),2)) / (_R_clad + x_ox_a));
-        node->operator()(1) /= (std::sqrt(pow(node[0](0),2) + pow(node[0](1),2)) / (_R_clad + x_ox_a)); 
+        auto r = std::sqrt(pow((*node)(0),2) + pow((*node)(1),2));
+        node->operator()(0) /= r/(_R_clad+x_ox_a);
+        node->operator()(1) /= r/(_R_clad+x_ox_a);
       }
       else
       {

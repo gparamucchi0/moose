@@ -130,19 +130,19 @@ XFEMC4VelocityZrAB::computeMovingInterfaceVelocity(dof_id_type point_id, RealVec
   {
     diffusivity_beta = 0.274 * exp(-34308 / 1.987 / _temperature) * 1e8;
   }
-  std::cout << "a_b Normale :" << normal << std::endl;
+  //std::cout << "a_b Normale :" << normal << std::endl;
   const Real J_b_to_a = -diffusivity_alpha * grad_positive(0); //* normal;
   const Real J_a_to_b = -diffusivity_beta * grad_negative(0); //* normal;
 
-  std::cout << "ab_grad_negative : " << grad_negative << std::endl;
-  std::cout << "ab_grad_positive : " << grad_positive  << std::endl;
+  //std::cout << "ab_grad_negative : " << grad_negative << std::endl;
+  //std::cout << "ab_grad_positive : " << grad_positive  << std::endl;
 
-  std::cout << "J_a : " << J_b_to_a /* 4.33e28*/<< std::endl;
-  std::cout << "J_b : " << J_a_to_b /* 4.33e28*/<< std::endl;
+  //std::cout << "J_a : " << J_b_to_a /* 4.33e28*/<< std::endl;
+  //std::cout << "J_b : " << J_a_to_b /* 4.33e28*/<< std::endl;
 
   const Real v_a_b = (J_b_to_a - J_a_to_b) / (c_o_a_b - c_o_b_a);
 
-  std::cout << "Alpha-beta velocity : " << v_a_b << std::endl;
+  //std::cout << "Alpha-beta velocity : " << v_a_b << std::endl;
 
   return v_a_b;
 }
