@@ -1,22 +1,24 @@
 [GlobalParams]
   order = FIRST
   family = LAGRANGE
+  #radius = 1400
 []
 
 [Mesh]
-  [gen]
-    type = GeneratedMeshGenerator
-    dim = 3
-    nx = 11
-    ny = 1
-    nz = 1
-    xmin = 0.0
-    xmax = 20.0
-    ymin = 0.0
-    ymax = 5.0
-    zmin = 0.0
-    zmax = 5.0
-    elem_type = HEX8
+  [ring]
+    type = AnnularMeshGenerator
+    nt =50
+    nr =10
+    rmin = 1400
+    rmax = 2000
+  []
+  [Clad]
+    type = MeshExtruderGenerator
+    input = ring 
+    extrusion_vector = '0 0 2'
+    bottom_sideset = 'bottom'
+    top_sideset = 'top'
+    num_layers = 2
   []
 []
 
@@ -27,24 +29,31 @@
 
 [UserObjects]
   [velocity]
-    type = XFEMPhaseTransitionMovingInterfaceVelocity
+   type = XFEMPhaseTransitionMovingInterfaceVelocity
     diffusivity_at_positive_level_set = 5
     diffusivity_at_negative_level_set = 1
     equilibrium_concentration_jump = 1
     value_at_interface_uo = value_uo
   []
+  [velocity_a_b]
+    type = XFEMC4VelocityZrAB
+    value_at_interface_uo = value_uo
+  []
   [value_uo]
     type = NodeValueAtXFEMInterface
     variable = 'u'
-    interface_mesh_cut_userobject = 'cut_mesh'
-    execute_on = TIMESTEP_END
+   interface_mesh_cut_userobject = 'cut_mesh'
+   execute_on = TIMESTEP_END
     level_set_var = ls
   []
   [cut_mesh]
-    type = InterfaceMeshCut3DUserObject
-    mesh_file = flat_interface_2d.e
-    interface_velocity_uo = velocity
+    type = InterfaceMeshCut3DUserObjectZr
+    mesh_file = cylinder_zirc_coarse.e
+    interface_velocity_uo = velocity_a_b
     heal_always = true
+    is_C4 = true
+    ab_interface = true
+    clad_rad = 1400
   []
 []
 
@@ -57,7 +66,7 @@
   [ic_u]
     type = FunctionIC
     variable = u
-    function = 'if(x<5.01, 2, 1)'
+    function = '1'
   []
 []
 
@@ -126,13 +135,13 @@
     type = DirichletBC
     variable = u
     value = 2
-    boundary = left
+    boundary = rmax
   []
 
   [right_u]
     type = NeumannBC
     variable = u
-    boundary = right
+    boundary = rmin
     value = 0
   []
 []

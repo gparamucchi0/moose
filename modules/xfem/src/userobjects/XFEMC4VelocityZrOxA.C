@@ -37,7 +37,7 @@ XFEMC4VelocityZrOxA::computeMovingInterfaceVelocity(dof_id_type point_id, RealVe
 
   //  std::cout << "point_id: " << point_id << std::endl;
 
-  std::cout << "xt: " << xt << std::endl;
+  //std::cout << "xt: " << xt << std::endl;
 
   const Real zirconium_PBR(1.55);
   Real delta = zirconium_PBR * std::abs(xt - 600);
@@ -145,11 +145,11 @@ XFEMC4VelocityZrOxA::computeMovingInterfaceVelocity(dof_id_type point_id, RealVe
 
   const Real J_o = -diffusivity_alpha * con_zr * (-grad_negative(0) * 1e-6); //* normal ;
 
-  std::cout << "ox_a_grad_negative : " << grad_negative << std::endl;
-  std::cout << "ox_a_grad_positive : " << grad_positive << std::endl;
-  std::cout << "ox_a normal : " << normal << std::endl;
-  std::cout << "ox_a J_v : " << _J_v << std::endl;
-  std::cout << "ox_a J_o : " << J_o << std::endl;
+  //std::cout << "ox_a_grad_negative : " << grad_negative << std::endl;
+  //std::cout << "ox_a_grad_positive : " << grad_positive << std::endl;
+  //std::cout << "ox_a normal : " << normal << std::endl;
+  //std::cout << "ox_a J_v : " << _J_v << std::endl;
+  //std::cout << "ox_a J_o : " << J_o << std::endl;
 
   const Real v_ox_a_init =
       sqrt(0.01126 * exp(-35890 / (1.987 * _temperature)) / (2 * _t)) * (-1e-2);
@@ -158,10 +158,10 @@ XFEMC4VelocityZrOxA::computeMovingInterfaceVelocity(dof_id_type point_id, RealVe
 
   if (delta == 0)
   {
-    std::cout << "Oxide-alpha (initial) velocity : " << v_ox_a_init << std::endl;
+    //std::cout << "Oxide-alpha (initial) velocity : " << v_ox_a_init << std::endl;
     return v_ox_a_init;
   }
   else
-    std::cout << "Oxide-alpha velocity : " << v_ox_a << std::endl;
+    //std::cout << "Oxide-alpha velocity : " << v_ox_a << std::endl;
   return v_ox_a;
 }

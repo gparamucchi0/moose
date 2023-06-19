@@ -35,7 +35,7 @@ XFEMC4VelocitySteelOx::computeMovingInterfaceVelocity(dof_id_type point_id, Real
 
   //Oxide thickness [µm]
   Real delta = std::abs(xt - 5);
-  std::cout << "delta : " << delta << std::endl;
+  //std::cout << "delta : " << delta << std::endl;
 
 
   // Current implementation only supports the case that the interface is moving horizontally
@@ -115,7 +115,7 @@ XFEMC4VelocitySteelOx::computeMovingInterfaceVelocity(dof_id_type point_id, Real
 
   const Real v_ox = - gamma_VMn * V_spinel / delta;
 
-  std::cout<< "Velocity : " << v_ox << std::endl;
+  //std::cout<< "Velocity : " << v_ox << std::endl;
 
   return v_ox;
 }
