@@ -8,7 +8,7 @@
   [ring]
     type = AnnularMeshGenerator
     nt =50
-    nr =10
+    nr =50
     rmin = 1400
     rmax = 2000
   []
@@ -48,7 +48,7 @@
   []
   [cut_mesh]
     type = InterfaceMeshCut3DUserObjectZr
-    mesh_file = cylinder_zirc_coarse.e
+    mesh_file = cylZr3d_coarser.e
     interface_velocity_uo = velocity_a_b
     heal_always = true
     is_C4 = true
