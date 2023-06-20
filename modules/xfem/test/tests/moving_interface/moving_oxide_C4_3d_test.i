@@ -18,7 +18,8 @@
 [Mesh]
   [mesh]
     type = FileMeshGenerator
-    file = 'test_volume_mesh.e' #boundaries are not working 
+    file = 'larger_quarter_cladd_25.e' 
+  []
 []
 
 [XFEM]
@@ -33,38 +34,20 @@
     interface_mesh_cut_userobject = 'moving_line_segments_ox_a'
     execute_on = 'nonlinear'
     level_set_var = ls_ox_a
+    is_3d = true
   []
   [velocity_ox_a]
     type = XFEMC4VelocityZrOxA
     value_at_interface_uo = value_uo_ox_a
+    is_3d = true 
   []
   [moving_line_segments_ox_a]
     type = InterfaceMeshCut3DUserObjectZr
-    mesh_file = cylZr3d_coarser.e
+    mesh_file = interface_quarter_coarse1.e
     interface_velocity_uo = velocity_ox_a
     heal_always = true
     is_C4 = true
     oxa_interface = true
-    clad_rad = 1400
-  []
-  [value_uo_a_b]
-    type = NodeValueAtXFEMInterface
-    variable = 'u'
-    interface_mesh_cut_userobject = 'moving_line_segments_a_b'
-    execute_on = 'nonlinear'
-    level_set_var = ls_a_b
-  []
-  [velocity_a_b]
-    type = XFEMC4VelocityZrAB
-    value_at_interface_uo = value_uo_a_b
-  []
-  [moving_line_segments_a_b]
-    type = InterfaceMeshCut3DUserObjectZr
-    mesh_file = cylZr3d_coarser.e
-    interface_velocity_uo = velocity_a_b
-    heal_always = true
-    is_C4 = true
-    ab_interface = true
     clad_rad = 1400
   []
 []
@@ -79,16 +62,12 @@
     #type = C4ZrIC4
     type = FunctionIC
     variable = u
-    function = 'if (x<1990.2, 0.0075,0.3679)'
+    function = 'if (sqrt(x^2+y^2)<1990.2, 0.0075,0.3679)'
   []
 []
 
 [AuxVariables]
   [ls_ox_a]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [ls_a_b]
     order = FIRST
     family = LAGRANGE
   []
@@ -98,13 +77,6 @@
   [u_constraint_ox_a]
     type = XFEMEqualValueAtInterfaceC4aox
     geometric_cut_userobject = 'moving_line_segments_ox_a'
-    use_displaced_mesh = false
-    variable = u
-    alpha = 1e5
-  []
-  [u_constraint_a_b]
-    type = XFEMEqualValueAtInterfaceC4ab
-    geometric_cut_userobject = 'moving_line_segments_a_b'
     use_displaced_mesh = false
     variable = u
     alpha = 1e5
@@ -129,19 +101,10 @@
     mesh_cut_user_object = 'moving_line_segments_ox_a'
     variable = ls_ox_a
   []
-  [ls_a_b]
-    type = MeshCutLevelSetAux
-    mesh_cut_user_object = 'moving_line_segments_a_b'
-    variable = ls_a_b
-  []
 []
 
 [Materials]
   [diffusivity_beta]
-    type = C4DiffusionCoefBeta
-    prop_names = beta_diffusion_coefficient
-  []
-  [diffusivity_alpha]
     type = C4DiffusionCoefAlpha
     prop_names = alpha_diffusion_coefficient
   []
@@ -151,12 +114,10 @@
     prop_values = 10e6
   []
   [diff_combined]
-    type = LevelSetTriMaterialReal
-    levelset_neg_neg_base = 'beta'
-    levelset_pos_neg_base = 'alpha'
-    levelset_pos_pos_base = 'oxide'
-    ls_var_1 = ls_a_b
-    ls_var_2 = ls_ox_a
+    type = LevelSetBiMaterialReal
+    levelset_positive_base = 'oxide'
+    levelset_negative_base = 'alpha'
+    level_set_var = ls_ox_a
     prop_name = diffusion_coefficient
     outputs = exodus
   []
@@ -168,32 +129,34 @@
     type = NeumannBC
     variable = u
     value = 0
-    boundary = rmax
+    boundary = '1'
   []
 
   [right_u]
     type = DirichletBCRightC4Zr
+    two_interfaces = false 
     variable = u
-    boundary = rmax
+    boundary = '2'
   []
 []
 
-#[Postprocessors]
-#  [position_ox_a]
-#    type = PositionOfXFEMInterfacePostprocessor
-#    value_at_interface_uo = value_uo_ox_a
-#    execute_on ='timestep_end final'
-#  []
+[Postprocessors]
+  [position_ox_a]
+    type = PositionOfXFEMInterfacePostprocessor
+    value_at_interface_uo = value_uo_ox_a
+    execute_on ='timestep_end final'
+  []
 #  [position_a_b]
 #    type = PositionOfXFEMInterfacePostprocessor
 #    value_at_interface_uo = value_uo_a_b
 #    execute_on ='timestep_end final'
-##  []
-#  [oxide_thickness]
-#    type = OxideThicknessZr
-#    oxide_alpha_pos = position_ox_a
-#    execute_on ='timestep_end final'
 #  []
+  [oxide_thickness]
+    type = OxideThicknessZr
+    oxide_alpha_pos = position_ox_a
+    execute_on ='timestep_end final'
+    is_3d = true 
+  []
 #  [alpha_thickness]
 #    type = AlphaThicknessZr
 #    oxide_alpha_pos = position_ox_a
@@ -229,20 +192,20 @@
 #    alpha_thickness = alpha_thickness
 #    execute_on = 'timestep_end final'
 #  []
-#[]
+[]
 
-#[VectorPostprocessors]
-#  [O_profile]
-#    type = LineValueSampler
-#    use_displaced_mesh = false
-#    start_point = '2000 0 0'
-#    end_point = '1400 0 0'
-#    sort_by = x
-#    num_points = 601
-#    outputs = csv
-#    variable = 'u'
-#  []
-#[]
+[VectorPostprocessors]
+  [O_profile]
+    type = LineValueSampler
+    use_displaced_mesh = false
+    start_point = '2000 0 0'
+    end_point = '1400 0 0'
+    sort_by = x
+    num_points = 601
+    outputs = csv
+    variable = 'u'
+  []
+[]
 
 #[Controls]
 #

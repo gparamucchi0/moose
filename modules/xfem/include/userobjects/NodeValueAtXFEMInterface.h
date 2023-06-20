@@ -121,4 +121,7 @@ protected:
 
   ///Point current position (avg value)
   double _current_pos;
+  
+  //3d parameter true/false
+  bool _is_3d;
 };

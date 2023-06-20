@@ -49,6 +49,8 @@ protected:
   // Temperature [K]
   Real _temperature;
 
+  // 3D case true or false
+  bool _is_3d;
   // Vacancy flux [/m²/s]
   mutable Real _J_v;
 
