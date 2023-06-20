@@ -17,11 +17,14 @@ OxideThicknessZr::validParams()
   InputParameters params = GeneralPostprocessor::validParams();
   params.addParam<PostprocessorName>(
       "oxide_alpha_pos", "The name of the postprocessor giving the oxide/alpha interface position");
+  //3D parameter
+  params.addParam<bool>("is_3d", false, "3D case");
   return params;
 }
 
 OxideThicknessZr::OxideThicknessZr(const InputParameters & parameters)
-  : GeneralPostprocessor(parameters), _delta(0), _x_ox_a(getPostprocessorValue("oxide_alpha_pos"))
+  : GeneralPostprocessor(parameters), _delta(0), _x_ox_a(getPostprocessorValue("oxide_alpha_pos")),
+  _is_3d(getParam<bool>("is_3d"))
 {
 }
 
@@ -34,7 +37,16 @@ void
 OxideThicknessZr::execute()
 {
   const Real PBR(1.55);           // Zr Pilling-Bedworth ratio
-  _delta = (600 - _x_ox_a) * PBR; // Oxide thickness [um]
+  if (!_is_3d)
+  {
+    _delta = (600 - _x_ox_a) * PBR; // Oxide thickness [um]
+  }
+  else
+  {
+    _delta = (2000 - _x_ox_a) * PBR; // Oxide thickness [um]
+  }
+  
+  
 }
 
 Real

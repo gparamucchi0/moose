@@ -16,7 +16,7 @@ PositionOfXFEMInterfacePostprocessor::validParams()
 {
   InputParameters params = GeneralPostprocessor::validParams();
   params.addClassDescription(
-      "Retrieves the gradient value on the specified side of a specified interface ");
+      "Retrieves the value on the specified side of a specified interface ");
   params.addRequiredParam<UserObjectName>("value_at_interface_uo",
       "The name of the userobject that obtains the value and gradient at the interface.");
   return params;

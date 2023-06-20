@@ -191,9 +191,11 @@ InterfaceMeshCut3DUserObjectZr::initialSetup()
      {
       if (!((node[0](0) == 0) && (node[0](1) == 0)))
       {
+        //std::cout << "Node before:" << node->get_info() << std::endl;
         auto r = std::sqrt(pow((*node)(0),2) + pow((*node)(1),2));
         node->operator()(0) /= r/(_R_clad+x_ox_a);
         node->operator()(1) /= r/(_R_clad+x_ox_a);
+        //std::cout << "Node after:" << node->get_info() << std::endl;
       }
       else
       {

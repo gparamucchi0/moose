@@ -17,13 +17,17 @@ XFEMC4VelocityZrOxA::validParams()
 {
   InputParameters params = XFEMMovingInterfaceVelocityBase::validParams();
   params.addParam<Real>("temperature", 1473.15, "Temperature of the cladding (K)");
+  //3d parameter 
+  params.addParam<bool>("is_3d", false, "3D case");
+  //class description
   params.addClassDescription("Calculate the metal/oxide interface velocity for the 1 interface C4 "
                              "model for Zircaloy-4 corrosion.");
   return params;
 }
 
 XFEMC4VelocityZrOxA::XFEMC4VelocityZrOxA(const InputParameters & parameters)
-  : XFEMMovingInterfaceVelocityBase(parameters), _temperature(getParam<Real>("temperature"))
+  : XFEMMovingInterfaceVelocityBase(parameters), _temperature(getParam<Real>("temperature")), 
+  _is_3d(getParam<bool>("is_3d"))
 {
 }
 
@@ -40,8 +44,20 @@ XFEMC4VelocityZrOxA::computeMovingInterfaceVelocity(dof_id_type point_id, RealVe
   //std::cout << "xt: " << xt << std::endl;
 
   const Real zirconium_PBR(1.55);
-  Real delta = zirconium_PBR * std::abs(xt - 600);
-  // std::cout << "delta : " << delta << std::endl;
+  Real delta;
+  if (!_is_3d)
+  {
+    delta = zirconium_PBR * std::abs(xt - 600);
+    // std::cout << "delta : " << delta << std::endl;
+  }
+  else
+  {
+    delta = zirconium_PBR * std::abs(xt - 2000); //working only for this curvature of tube for test 
+                                                      //need to change for real cladding  
+    // std::cout << "delta : " << delta << std::endl;
+  }
+  
+  
 
   // Current implementation only supports the case that the interface is moving horizontally
 

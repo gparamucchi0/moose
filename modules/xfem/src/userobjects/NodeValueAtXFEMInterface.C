@@ -27,6 +27,9 @@ NodeValueAtXFEMInterface::validParams()
       "Name of InterfaceMeshCutUserObject that provides cut locations to this UserObject.");
   params.addRequiredParam<VariableName>(
       "level_set_var", "The name of level set variable used to represent the interface");
+  //3d parameter
+  params.addParam<bool>("is_3d", false, "3D case");
+  //class descritption
   params.addClassDescription("Obtain field values and gradients on the interface.");
   return params;
 }
@@ -38,7 +41,8 @@ NodeValueAtXFEMInterface::NodeValueAtXFEMInterface(const InputParameters & param
     _level_set_var_number(
         _subproblem.getVariable(_tid, parameters.get<VariableName>("level_set_var")).number()),
     _system(_subproblem.getSystem(getParam<VariableName>("level_set_var"))),
-    _solution(*_system.current_local_solution.get())
+    _solution(*_system.current_local_solution.get()),
+    _is_3d(getParam<bool>("is_3d"))
 {  
 }
 
@@ -116,18 +120,32 @@ NodeValueAtXFEMInterface::execute()
     }
   }
   //Take the average o the x position to return the posisition of the interface 
-  std::list<double> Xcomps;
+  std::vector<double> Xcomps;
+  std::vector<double> Ycomps;
   double sum = 0;
   for ( auto & node : cutter_mesh->node_ptr_range())
   {
    Xcomps.push_back(node->operator()(0));
+   Ycomps.push_back(node->operator()(1));
   }
-  for (double Xcomp : Xcomps)
+  if (!_is_3d)
   {
+    for (double Xcomp : Xcomps)
+    {
     sum += Xcomp;
+    }
+    _current_pos = sum / Xcomps.size(); 
   }
-  _current_pos = sum / Xcomps.size(); 
+  else
+  {
+    for (int i =0; i < Xcomps.size(); i++)
+    {
+     sum += std::sqrt(pow(Xcomps[i],2) + pow(Ycomps[i],2));
+    }
+    _current_pos = sum / Xcomps.size();
+  }
 }
+  
 
 void
 NodeValueAtXFEMInterface::finalize()
