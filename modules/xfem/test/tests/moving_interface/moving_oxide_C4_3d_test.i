@@ -18,7 +18,7 @@
 [Mesh]
   [mesh]
     type = FileMeshGenerator
-    file = 'larger_quarter_cladd_25.e' 
+    file = 'mesh_30deg.e' 
   []
 []
 
@@ -43,7 +43,7 @@
   []
   [moving_line_segments_ox_a]
     type = InterfaceMeshCut3DUserObjectZr
-    mesh_file = interface_quarter_coarse1.e
+    mesh_file = interface_30deg.e
     interface_velocity_uo = velocity_ox_a
     heal_always = true
     is_C4 = true
@@ -59,10 +59,8 @@
 
 [ICs]
   [ic_u]
-    #type = C4ZrIC4
-    type = FunctionIC
+    type = C4ZrIC1Int
     variable = u
-    function = 'if (sqrt(x^2+y^2)<1990.2, 0.0075,0.3679)'
   []
 []
 
@@ -129,14 +127,14 @@
     type = NeumannBC
     variable = u
     value = 0
-    boundary = '1'
+    boundary = '3'
   []
 
   [right_u]
     type = DirichletBCRightC4Zr
     two_interfaces = false 
     variable = u
-    boundary = '2'
+    boundary = '1'
   []
 []
 
@@ -208,14 +206,12 @@
 []
 
 #[Controls]
-#
-#    [control]
-#        type = TimePeriod
-#        disable_objects = 'UserObjects::velocity_a_b UserObjects::velocity_ox_a'
-#        start_time = '0'
-#        end_time = '1'
-#
-#    []
+#  [control]
+#    type = TimePeriod
+#    disable_objects = 'UserObjects::velocity_ox_a'
+#    start_time = '0'
+#    end_time = '1'
+#  []
 #[]
 
 [Executioner]
@@ -235,7 +231,7 @@
 
   start_time = 0 
   dt = 1 
-  num_steps = 50
+  num_steps = 300
   max_xfem_update = 1
 
 []
