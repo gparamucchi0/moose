@@ -73,8 +73,8 @@ InterfaceMeshCutUserObjectBase::initialSetup()
   }
 
   for (const auto & node : _cutter_mesh->node_ptr_range())
-    _initial_nodes_location[node->id()] = *node;  
-                                                 
+    _initial_nodes_location[node->id()] = *node;
+
   for (const auto & elem : _cutter_mesh->element_ptr_range())
     for (unsigned int n = 0; n < elem->n_nodes(); n++)
       _node_to_elem_map[elem->node_id(n)].push_back(elem->id());
@@ -151,14 +151,16 @@ InterfaceMeshCutUserObjectBase::initialize()
   for (const auto & node : _cutter_mesh->node_ptr_range())
   {
     Point p = *node;
-    p += _dt * nodeNormal(node->id()) * node_velocity[node->id()];
+    // WJ
+    // if (node->id() != 0 && node->id() != (_cutter_mesh->max_node_id() - 1))
+    if (node->id() != 110 && node->id() != 148 && node->id() != 109)
+      p += _dt * nodeNormal(node->id()) * node_velocity[node->id()];
+    else
+      p += _dt * Point(0, 0, 0) * node_velocity[node->id()];
     new_position[node->id()] = p;
   }
   for (const auto & node : _cutter_mesh->node_ptr_range())
-    {_cutter_mesh->node_ref(node->id()) = new_position[node->id()];
-    //std::string info = node->get_info();
-    //std::cout << info;
-    }
+    _cutter_mesh->node_ref(node->id()) = new_position[node->id()];
 
   if (_output_exodus)
   {
