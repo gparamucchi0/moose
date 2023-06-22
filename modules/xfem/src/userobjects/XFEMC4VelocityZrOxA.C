@@ -167,8 +167,7 @@ XFEMC4VelocityZrOxA::computeMovingInterfaceVelocity(dof_id_type point_id, RealVe
   //std::cout << "ox_a J_v : " << _J_v << std::endl;
   //std::cout << "ox_a J_o : " << J_o << std::endl;
 
-  const Real v_ox_a_init =
-      sqrt(0.01126 * exp(-35890 / (1.987 * _temperature)) / (2 * _t)) * (-1e-2);
+  const Real v_ox_a_init = sqrt(0.01126 * exp(-35890 / (1.987 * _temperature)) / (2 * _t)) * (-1e-2);
   const Real v_ox_a = 1e6 * (J_o - _J_v) / (con_zr * (3 * x_o_ox_m - (x_o_m_ox / (1 - x_o_m_ox))));
   //  _ox_vel = v_ox_a;
 
