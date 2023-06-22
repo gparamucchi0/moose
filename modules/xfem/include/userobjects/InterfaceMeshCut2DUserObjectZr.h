@@ -60,7 +60,9 @@ protected:
   bool _is_expcomp;
   bool _ab_interface;
   bool _oxa_interface;
+  bool _is_3d;
   
   Real _temperature;
+  Real _R_clad;
 
 };

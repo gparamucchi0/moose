@@ -113,14 +113,15 @@ C4ZrICConst::C4ZrICConst(const InputParameters & parameters)
 Real
 C4ZrICConst::value(const Point & p)
 {
-  if (p(0) < _x_a_b)
-  {
-    return _C_b;
-  }
-  else if (p(0) < _x_ox_a)
+  //if (p(0) < _x_a_b)
+  //{
+  //  return _C_b;
+  //}
+  Real norm_2D = std::sqrt(pow(p(0),2) + pow(p(1),2));
+  if (norm_2D < _x_ox_a+1400)
   {
     // return (_C_b_a + (_C_a_ox - _C_a_b)/2);
-    return _C_b_a;
+    return _C_b;//_C_b_a;
   }
   else
   {
