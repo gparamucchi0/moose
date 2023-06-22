@@ -24,6 +24,9 @@ InterfaceMeshCut2DUserObjectZr::validParams()
   params.addParam<bool>("ab_interface",false,"Boolean specifying if the object is used for alpha/beta interface.");
   params.addParam<bool>("oxa_interface",false,"Boolean specifying if the object is used for oxide/alpha interface.");
   params.addParam<Real>("temperature",1473.15,"Temperature of the cladding [K]. Homogeneous temperature only.");
+  params.addParam<Real>("clad_rad",49700,"Inner radius of the cladding [um]. Needed for intial setup of the mesh");
+  //3d parameter
+  params.addParam<bool>("is_3d", false, "3D case");
   //class description
   params.addClassDescription("A userobject to cut a 2D mesh using a 1D cutter mesh.");
   //return params
@@ -35,7 +38,9 @@ InterfaceMeshCut2DUserObjectZr::InterfaceMeshCut2DUserObjectZr(const InputParame
     _is_expcomp(getParam<bool>("is_expcomp")),
     _ab_interface(getParam<bool>("ab_interface")),
     _oxa_interface(getParam<bool>("oxa_interface")),
-    _temperature(getParam<Real>("temperature"))
+    _is_3d(getParam<bool>("is_3d")),
+    _temperature(getParam<Real>("temperature")),
+    _R_clad(getParam<Real>("clad_rad"))
 {
   for (const auto & elem : _cutter_mesh->element_ptr_range())
     if (elem->type() != EDGE2)
@@ -75,8 +80,8 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
       }
 
         //Real x_a_b = 541.7;
-/**      if (MooseUtils::absoluteFuzzyEqual(_temperature,1273.15,1))
-      {
+       /**      if (MooseUtils::absoluteFuzzyEqual(_temperature,1273.15,1))
+       {
         x_a_b = 591.4;
       }
       else if (MooseUtils::absoluteFuzzyEqual(_temperature,1373.15,1))
@@ -115,7 +120,26 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
      }*/
      for (auto & node : _cutter_mesh->node_ptr_range())
      {
-      node->operator()(0) += - node[0](0) + x_a_b;
+       if (!_is_3d)
+       {
+        node->operator()(0) += - node[0](0) + x_a_b;
+       }
+       else
+       {
+         if (!((node[0](0) == 0) && (node[0](1) == 0)))
+         {
+           std::cout << "Node before:" << node->get_info() << std::endl;
+           auto r = std::sqrt(pow((*node)(0),2) + pow((*node)(1),2));
+           node->operator()(0) /= r/(_R_clad+x_a_b);
+           node->operator()(1) /= r/(_R_clad+x_a_b);
+           std::cout << "Node after:" << node->get_info() << std::endl;
+         }
+         else
+         {
+           mooseError("Cylinder interface mesh not set up properly"
+                    "A mesh nodes is at (0,0)");
+         }
+       }
      }
     }
     if (_oxa_interface)
@@ -127,10 +151,10 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
       }
       else
       {
-        x_ox_a =590.0;
+        x_ox_a =591.0;
       }
       //Real x_ox_a = 577.9;
-/**      if (MooseUtils::absoluteFuzzyEqual(_temperature,1273.15,1))
+      /**      if (MooseUtils::absoluteFuzzyEqual(_temperature,1273.15,1))
       {
         x_ox_a = 595.6;
       }
@@ -166,9 +190,28 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
        Node->assign(const TypeVector<double> p =(x_ox_a, Node[1], Node[2]));
       }
      }*/
-     for (auto & node : _cutter_mesh->node_ptr_range())
-     {
-      node->operator()(0) += - node[0](0) + x_ox_a;
+      for (auto & node : _cutter_mesh->node_ptr_range())
+      {
+       if (!_is_3d)
+       {
+         node->operator()(0) += - node[0](0) + x_ox_a;
+       }
+       else
+       {
+         if (!((node[0](0) == 0) && (node[0](1) == 0)))
+         {
+           //std::cout << "Node before:" << node->get_info() << std::endl;
+           auto r = std::sqrt(pow((*node)(0),2) + pow((*node)(1),2));
+           node->operator()(0) /= r/(_R_clad+x_ox_a);
+           node->operator()(1) /= r/(_R_clad+x_ox_a);
+           //std::cout << "Node after:" << node->get_info() << std::endl;
+         }
+         else
+         {
+           mooseError("Cylinder interface mesh not set up properly"
+                    "A mesh nodes is at (0,0)");
+         }
+       }
      }
     }
 

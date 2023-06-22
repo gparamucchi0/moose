@@ -131,8 +131,8 @@ XFEMC4VelocityZrAB::computeMovingInterfaceVelocity(dof_id_type point_id, RealVec
     diffusivity_beta = 0.274 * exp(-34308 / 1.987 / _temperature) * 1e8;
   }
   //std::cout << "a_b Normale :" << normal << std::endl;
-  const Real J_b_to_a = -diffusivity_alpha * grad_positive(0); //* normal;
-  const Real J_a_to_b = -diffusivity_beta * grad_negative(0); //* normal;
+  const Real J_b_to_a = -diffusivity_alpha * grad_positive  * normal;
+  const Real J_a_to_b = -diffusivity_beta * grad_negative * normal;
 
   //std::cout << "ab_grad_negative : " << grad_negative << std::endl;
   //std::cout << "ab_grad_positive : " << grad_positive  << std::endl;

@@ -142,7 +142,7 @@ C4ZrIC1Int::value(const Point & p)
   {
     return (_C_b_a + (p(0) - _x_a_b) * _grad_ba);
   }*/
-  if (p(0) < _x_a_break)
+  if ( norm_2D < _x_a_break)
   {
     return (_C_ox_a_weak + (_x_a_break - _x_ox_a) * _grad_aox);
   }

@@ -138,7 +138,7 @@ NodeValueAtXFEMInterface::execute()
   }
   else
   {
-    for (int i =0; i < Xcomps.size(); i++)
+    for (auto i =0; i < Xcomps.size(); i++)
     {
      sum += std::sqrt(pow(Xcomps[i],2) + pow(Ycomps[i],2));
     }

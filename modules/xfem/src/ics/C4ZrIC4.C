@@ -18,13 +18,16 @@ C4ZrIC4::validParams()
   InputParameters params = InitialCondition::validParams();
   params.addRequiredParam<Real>("temperature",
                                 "The temperature of the cladding (homogeneous temperature only)");
+  //3d parameter
+  params.addParam<bool>("is_3d", false, "3d case");
   params.addClassDescription("An initial condition for the C4 model for high temperature "
                              "corrosion of Zircaloy-4");
   return params;
 }
 
 C4ZrIC4::C4ZrIC4(const InputParameters & parameters)
-  : InitialCondition(parameters), _temperature(getParam<Real>("temperature"))
+  : InitialCondition(parameters), _temperature(getParam<Real>("temperature")),
+  _is_3d(getParam<bool>("is_3d"))
 {
   if (MooseUtils::absoluteFuzzyEqual(_temperature, 1273.15, 1))
   {
@@ -133,24 +136,56 @@ C4ZrIC4::C4ZrIC4(const InputParameters & parameters)
 Real
 C4ZrIC4::value(const Point & p)
 {
-  if (p(0) < _x_b_break)
+  Real norm_2D;
+  if (!_is_3d )
   {
+   norm_2D = p(0);
+
+   if (norm_2D < _x_b_break)
+   {
     return _C_b;
-  }
-  else if (p(0) < _x_a_b)
-  {
-    return (_C_b_a + (p(0) - _x_a_b) * _grad_ba);
-  }
-  else if (p(0) < _x_a_break)
-  {
-    return (_C_b_a + (p(0) - _x_a_b) * _grad_ab);
-  }
-  else if (p(0) < _x_ox_a)
-  {
-    return (_C_ox_a_weak + (p(0) - _x_ox_a) * _grad_aox);
+   }
+   else if (norm_2D < _x_a_b)
+   {
+     return (_C_b_a + (norm_2D - _x_a_b) * _grad_ba);
+   }
+   else if (norm_2D < _x_a_break)
+   {
+     return (_C_b_a + (norm_2D - _x_a_b) * _grad_ab);
+   }
+   else if (norm_2D < _x_ox_a)
+   {
+     return (_C_ox_a_weak + (norm_2D - _x_ox_a) * _grad_aox);
+   }
+   else
+   { 
+      return (_C_ox_weak + (norm_2D - 600) * _grad_ox);
+   }
   }
   else
   {
-    return (_C_ox_weak + (p(0) - 600) * _grad_ox);
+   norm_2D = std::sqrt(pow(p(0),2) + pow(p(1),2));
+  
+   if (norm_2D < _x_b_break + 1400)
+   {
+    return _C_b;
+   }
+   else if (norm_2D < _x_a_b +1400)
+   {
+     return (_C_b_a + (norm_2D - _x_a_b - 1400) * _grad_ba);
+   }
+   else if (norm_2D < _x_a_break + 1400)
+   {
+     return (_C_b_a + (norm_2D - _x_a_b - 1400) * _grad_ab);
+   }
+   else if (norm_2D < _x_ox_a + 1400)
+   {
+     return (_C_ox_a_weak + (norm_2D - _x_ox_a - 1400) * _grad_aox);
+   }
+   else
+   { 
+       return (_C_ox_weak + (norm_2D - 2000) * _grad_ox);
+   }
   }
+  
 }

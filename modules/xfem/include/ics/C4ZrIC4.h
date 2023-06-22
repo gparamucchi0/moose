@@ -96,4 +96,6 @@ protected:
   Real _grad_aox = 26620.03 * 1e-6;
 
   Real _grad_ox = (_C_ox-_C_ox_a)/(600-_x_ox_a);
+  //3d parameter true/false
+  bool _is_3d;
 };
