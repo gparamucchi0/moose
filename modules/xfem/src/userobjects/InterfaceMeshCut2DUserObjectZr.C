@@ -304,6 +304,8 @@ InterfaceMeshCut2DUserObjectZr::cutElementByGeometry(const Elem * elem,
 
   bool elem_cut = false;
 
+  //return elem_cut; // CHANGE IT BACK!!!
+
   for (const auto & cut_elem : _cutter_mesh->element_ptr_range())
   {
     unsigned int n_sides = elem->n_sides();

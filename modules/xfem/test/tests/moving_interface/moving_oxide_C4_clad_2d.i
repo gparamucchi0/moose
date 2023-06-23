@@ -32,7 +32,7 @@
     type = NodeValueAtXFEMInterface
     variable = 'u'
     interface_mesh_cut_userobject = 'moving_line_segments_ox_a'
-    execute_on = 'nonlinear'
+    execute_on = 'TIMESTEP_END'
     level_set_var = ls_ox_a
     is_3d = true 
   []
@@ -41,17 +41,33 @@
     value_at_interface_uo = value_uo_ox_a
     is_3d = true 
   []
+  # [moving_line_segments_ox_a]
+  #   type = InterfaceMeshCut2DUserObjectZr
+  #   mesh_file = interface_clad_30deg_2d.e 
+  #   interface_velocity_uo = velocity_ox_a
+  #   is_3d = true 
+  #   clad_rad = 1400
+  #   heal_always = true
+  #   is_C4 = true
+  #   oxa_interface = true
+
+  # []
+
   [moving_line_segments_ox_a]
-    type = InterfaceMeshCut2DUserObjectZr
+    type = InterfaceMeshCut2DUserObject
     mesh_file = interface_clad_30deg_2d.e 
-    interface_velocity_uo = velocity_ox_a
-    is_3d = true 
-    clad_rad = 1400
+   # interface_velocity_uo = velocity_ox_a
+    interface_velocity_function = -11
     heal_always = true
-    is_C4 = true
-    oxa_interface = true
 
   []
+
+  [line_seg_cut_uo]
+    type = LevelSetCutUserObject
+    level_set_var = ls_ox_a
+    heal_always = true
+  []
+
   #[value_uo_a_b]
   #  type = NodeValueAtXFEMInterface
   #  variable = 'u'
@@ -135,6 +151,7 @@
     type = MeshCutLevelSetAux
     mesh_cut_user_object = 'moving_line_segments_ox_a'
     variable = ls_ox_a
+    execute_on = 'TIMESTEP_BEGIN'
   []
   #[ls_a_b]
   #  type = MeshCutLevelSetAux
