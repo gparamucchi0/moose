@@ -151,7 +151,7 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
       }
       else
       {
-        x_ox_a =591.0;
+        x_ox_a =591.0/2; //MODIFY AGAIN AFTER TESTING
       }
       //Real x_ox_a = 577.9;
       /**      if (MooseUtils::absoluteFuzzyEqual(_temperature,1273.15,1))

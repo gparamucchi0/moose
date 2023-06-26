@@ -1,0 +1,59 @@
+//* This file is part of the MOOSE framework
+//* https://www.mooseframework.org
+//*
+//* All rights reserved, see COPYRIGHT for full restrictions
+//* https://github.com/idaholab/moose/blob/master/COPYRIGHT
+//*
+//* Licensed under LGPL 2.1, please see LICENSE for details
+//* https://www.gnu.org/licenses/lgpl-2.1.html
+
+#pragma once
+
+#include "InitialCondition.h"
+
+#include <string>
+
+/*Artificail initial condition just to smooth the x=295 transition for the 300 um slab.
+ */
+
+// Forward Declarations
+class CreepICu;
+class InputParameters;
+
+template <typename T>
+InputParameters validParams();
+
+template <>
+InputParameters validParams<CreepICu>();
+
+/**
+ * Defines a boundary condition that forces the value to be a user specified
+ * function at the boundary.
+ */
+class CreepICu : public InitialCondition
+{
+public:
+  static InputParameters validParams();
+
+  CreepICu(const InputParameters & parameters);
+
+protected:
+  /**
+   * Evaluate the function at the current quadrature point and time step.
+   */
+  //Real f();
+
+  /**
+   * The value of the variable at a point.
+   */
+  virtual Real value(const Point & p) override;
+
+  /**
+   * The value of the gradient at a point.
+   */
+  //virtual RealGradient gradient(const Point & p) override;
+
+  Real _x_1 = 0.0075;
+  
+  Real _x_2 = 0.45;
+};

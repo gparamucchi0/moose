@@ -1,0 +1,152 @@
+//* This file is part of the MOOSE framework
+//* https://www.mooseframework.org
+//*
+//* All rights reserved, see COPYRIGHT for full restrictions
+//* https://github.com/idaholab/moose/blob/master/COPYRIGHT
+//*
+//* Licensed under LGPL 2.1, please see LICENSE for details
+//* https://www.gnu.org/licenses/lgpl-2.1.html
+
+#include "PowerLawCreepStressUpdateChow.h"
+
+registerMooseObject("TensorMechanicsApp", PowerLawCreepStressUpdateChow);
+registerMooseObject("TensorMechanicsApp", ADPowerLawCreepStressUpdateChow);
+
+template <bool is_ad>
+InputParameters
+PowerLawCreepStressUpdateChowTempl<is_ad>::validParams()
+{
+  InputParameters params = RadialReturnCreepStressUpdateBaseTempl<is_ad>::validParams();
+  params.addClassDescription(
+      "This class uses the stress update material in a radial return isotropic power law creep "
+      "model. This class can be used in conjunction with other creep and plasticity materials "
+      "for more complex simulations. This specific version of the templated class also adds "
+      "coupling with the oxygen concentration distribution with Chow and al. model (1982)");
+
+  // Linear strain hardening parameters
+  params.addCoupledVar("temperature", "Coupled temperature");
+  params.addCoupledVar("u", "coupled reduced oxygen concentration");
+  params.addParam<Real>("coefficient", 5.3395e-28, "Leading coefficient in power-law equation IN Pa^-n");
+  params.addParam<Real>("n_exponent", 5.43, "Exponent on effective stress in power-law equation");
+  params.addParam<Real>("m_exponent", 0.0, "Exponent on time in power-law equation");
+  params.addParam<Real>("activation_energy", 320, "Activation energy");
+  params.addParam<Real>("gas_constant", 8.3143, "Universal gas constant");
+  params.addParam<Real>("Lambda", 0.4932, "coefficient in oxygen exp with u --> wt%(O)");
+  params.addParam<Real>("start_time", 0.0, "Start time (if not zero)");
+  return params;
+}
+
+template <bool is_ad>
+PowerLawCreepStressUpdateChowTempl<is_ad>::PowerLawCreepStressUpdateChowTempl(
+    const InputParameters & parameters)
+  : RadialReturnCreepStressUpdateBaseTempl<is_ad>(parameters),
+    _temperature(this->isParamValid("temperature")
+                     ? &this->template coupledGenericValue<is_ad>("temperature")
+                     : nullptr),
+    _u(this->isParamValid("u")
+                     ? &this->template coupledGenericValue<is_ad>("u")
+                     : nullptr),
+    _coefficient(this->template getParam<Real>("coefficient")),
+    _n_exponent(this->template getParam<Real>("n_exponent")),
+    _m_exponent(this->template getParam<Real>("m_exponent")),
+    _activation_energy(this->template getParam<Real>("activation_energy")),
+    _gas_constant(this->template getParam<Real>("gas_constant")),
+    _Lambda(this->template getParam<Real>("Lambda")),
+    _start_time(this->template getParam<Real>("start_time")),
+    _exponential(1.0),
+    _exp_ox(1.0)
+{
+  if (_start_time < this->_app.getStartTime() && (std::trunc(_m_exponent) != _m_exponent))
+    this->paramError("start_time",
+                     "Start time must be equal to or greater than the Executioner start_time if a "
+                     "non-integer m_exponent is used");
+}
+
+template <bool is_ad>
+void
+PowerLawCreepStressUpdateChowTempl<is_ad>::computeStressInitialize(
+    const GenericReal<is_ad> & /*effective_trial_stress*/,
+    const GenericRankFourTensor<is_ad> & /*elasticity_tensor*/)
+{
+  if (_temperature)
+    _exponential = std::exp(-_activation_energy / (_gas_constant * (*_temperature)[_qp]));
+  
+  if (_u)
+    _exp_ox = std::exp(-_Lambda * ((*_u)[_qp])/(1 + (*_u)[_qp]));
+
+  _exp_time = std::pow(_t - _start_time, _m_exponent);
+}
+
+template <bool is_ad>
+template <typename ScalarType>
+ScalarType
+PowerLawCreepStressUpdateChowTempl<is_ad>::computeResidualInternal(
+    const GenericReal<is_ad> & effective_trial_stress, const ScalarType & scalar)
+{
+  const ScalarType stress_delta = effective_trial_stress - _three_shear_modulus * scalar;
+  const ScalarType creep_rate =
+      _coefficient * std::pow(stress_delta, _n_exponent) * _exponential * _exp_time * _exp_ox;
+  return creep_rate * _dt - scalar;
+}
+
+template <bool is_ad>
+GenericReal<is_ad>
+PowerLawCreepStressUpdateChowTempl<is_ad>::computeDerivative(
+    const GenericReal<is_ad> & effective_trial_stress, const GenericReal<is_ad> & scalar)
+{
+  const GenericReal<is_ad> stress_delta = effective_trial_stress - _three_shear_modulus * scalar;
+  const GenericReal<is_ad> creep_rate_derivative =
+      -_coefficient * _three_shear_modulus * _n_exponent *
+      std::pow(stress_delta, _n_exponent - 1.0) * _exponential * _exp_time * _exp_ox;
+  return creep_rate_derivative * _dt - 1.0;
+}
+
+template <bool is_ad>
+Real
+PowerLawCreepStressUpdateChowTempl<is_ad>::computeStrainEnergyRateDensity(
+    const GenericMaterialProperty<RankTwoTensor, is_ad> & stress,
+    const GenericMaterialProperty<RankTwoTensor, is_ad> & strain_rate)
+{
+  if (_n_exponent <= 1)
+    return 0.0;
+
+  Real creep_factor = _n_exponent / (_n_exponent + 1);
+
+  return MetaPhysicL::raw_value(creep_factor * stress[_qp].doubleContraction((strain_rate)[_qp]));
+}
+
+template <bool is_ad>
+void
+PowerLawCreepStressUpdateChowTempl<is_ad>::computeStressFinalize(
+    const GenericRankTwoTensor<is_ad> & plastic_strain_increment)
+{
+  _creep_strain[_qp] += plastic_strain_increment;
+}
+
+template <bool is_ad>
+void
+PowerLawCreepStressUpdateChowTempl<is_ad>::resetIncrementalMaterialProperties()
+{
+  _creep_strain[_qp] = _creep_strain_old[_qp];
+}
+
+template <bool is_ad>
+bool
+PowerLawCreepStressUpdateChowTempl<is_ad>::substeppingCapabilityEnabled()
+{
+  return this->_use_substepping != RadialReturnStressUpdateTempl<is_ad>::SubsteppingType::NONE;
+}
+
+template class PowerLawCreepStressUpdateChowTempl<false>;
+template class PowerLawCreepStressUpdateChowTempl<true>;
+template Real PowerLawCreepStressUpdateChowTempl<false>::computeResidualInternal<Real>(const Real &,
+                                                                                   const Real &);
+template ADReal
+PowerLawCreepStressUpdateChowTempl<true>::computeResidualInternal<ADReal>(const ADReal &,
+                                                                      const ADReal &);
+template ChainedReal
+PowerLawCreepStressUpdateChowTempl<false>::computeResidualInternal<ChainedReal>(const Real &,
+                                                                            const ChainedReal &);
+template ChainedADReal
+PowerLawCreepStressUpdateChowTempl<true>::computeResidualInternal<ChainedADReal>(const ADReal &,
+                                                                             const ChainedADReal &);
