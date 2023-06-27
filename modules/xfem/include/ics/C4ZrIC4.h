@@ -97,5 +97,5 @@ protected:
 
   Real _grad_ox = (_C_ox-_C_ox_a)/(600-_x_ox_a);
   //3d parameter true/false
-  bool _is_3d;
+  bool _is_clad;
 };

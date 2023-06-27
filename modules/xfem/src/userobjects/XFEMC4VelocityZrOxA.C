@@ -18,7 +18,7 @@ XFEMC4VelocityZrOxA::validParams()
   InputParameters params = XFEMMovingInterfaceVelocityBase::validParams();
   params.addParam<Real>("temperature", 1473.15, "Temperature of the cladding (K)");
   //3d parameter 
-  params.addParam<bool>("is_3d", false, "3D case");
+  params.addParam<bool>("is_clad", false, "cylinder cladding case");
   //class description
   params.addClassDescription("Calculate the metal/oxide interface velocity for the 1 interface C4 "
                              "model for Zircaloy-4 corrosion.");
@@ -27,7 +27,7 @@ XFEMC4VelocityZrOxA::validParams()
 
 XFEMC4VelocityZrOxA::XFEMC4VelocityZrOxA(const InputParameters & parameters)
   : XFEMMovingInterfaceVelocityBase(parameters), _temperature(getParam<Real>("temperature")), 
-  _is_3d(getParam<bool>("is_3d"))
+  _is_clad(getParam<bool>("is_clad"))
 {
 }
 
@@ -45,7 +45,7 @@ XFEMC4VelocityZrOxA::computeMovingInterfaceVelocity(dof_id_type point_id, RealVe
 
   const Real zirconium_PBR(1.55);
   Real delta;
-  if (!_is_3d)
+  if (!_is_clad)
   {
     delta = zirconium_PBR * std::abs(xt - 600);
     // std::cout << "delta : " << delta << std::endl;

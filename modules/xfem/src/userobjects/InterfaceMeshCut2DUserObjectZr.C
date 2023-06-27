@@ -26,7 +26,7 @@ InterfaceMeshCut2DUserObjectZr::validParams()
   params.addParam<Real>("temperature",1473.15,"Temperature of the cladding [K]. Homogeneous temperature only.");
   params.addParam<Real>("clad_rad",49700,"Inner radius of the cladding [um]. Needed for intial setup of the mesh");
   //3d parameter
-  params.addParam<bool>("is_3d", false, "3D case");
+  params.addParam<bool>("is_clad", false, "cladding cylinder case");
   //class description
   params.addClassDescription("A userobject to cut a 2D mesh using a 1D cutter mesh.");
   //return params
@@ -38,7 +38,7 @@ InterfaceMeshCut2DUserObjectZr::InterfaceMeshCut2DUserObjectZr(const InputParame
     _is_expcomp(getParam<bool>("is_expcomp")),
     _ab_interface(getParam<bool>("ab_interface")),
     _oxa_interface(getParam<bool>("oxa_interface")),
-    _is_3d(getParam<bool>("is_3d")),
+    _is_clad(getParam<bool>("is_clad")),
     _temperature(getParam<Real>("temperature")),
     _R_clad(getParam<Real>("clad_rad"))
 {
@@ -120,7 +120,7 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
      }*/
      for (auto & node : _cutter_mesh->node_ptr_range())
      {
-       if (!_is_3d)
+       if (!_is_clad)
        {
         node->operator()(0) += - node[0](0) + x_a_b;
        }
@@ -151,7 +151,7 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
       }
       else
       {
-        x_ox_a =591.0/2; //MODIFY AGAIN AFTER TESTING
+        x_ox_a =591.0; 
       }
       //Real x_ox_a = 577.9;
       /**      if (MooseUtils::absoluteFuzzyEqual(_temperature,1273.15,1))
@@ -192,7 +192,7 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
      }*/
       for (auto & node : _cutter_mesh->node_ptr_range())
       {
-       if (!_is_3d)
+       if (!_is_clad)
        {
          node->operator()(0) += - node[0](0) + x_ox_a;
        }

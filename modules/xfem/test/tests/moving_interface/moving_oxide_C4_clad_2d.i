@@ -34,18 +34,18 @@
     interface_mesh_cut_userobject = 'moving_line_segments_ox_a'
     execute_on = 'nonlinear'
     level_set_var = ls_ox_a
-    is_3d = true 
+    is_clad = true 
   []
   [velocity_ox_a]
     type = XFEMC4VelocityZrOxA
     value_at_interface_uo = value_uo_ox_a
-    is_3d = true 
+    is_clad = true 
   []
   [moving_line_segments_ox_a]
     type = InterfaceMeshCut2DUserObjectZr
     mesh_file = interface_clad_30deg_2d.e 
     interface_velocity_uo = velocity_ox_a
-    is_3d = true 
+    is_clad = true 
     clad_rad = 1400
     heal_always = true
     is_C4 = true
@@ -58,7 +58,7 @@
   #  interface_mesh_cut_userobject = 'moving_line_segments_a_b'
   #  execute_on = 'nonlinear'
   #  level_set_var = ls_a_b
-  #  is_3d = true 
+  #  is_clad = true 
   #[]
   #[velocity_a_b]
   #  type = XFEMC4VelocityZrAB
@@ -68,7 +68,7 @@
   #  type = InterfaceMeshCut2DUserObjectZr
   #  mesh_file = interface_clad_30deg_2d.e 
   #  interface_velocity_uo = velocity_a_b
-  #  is_3d = true 
+  #  is_clad = true 
   #  clad_rad = 1400
   #  heal_always = true
   #  is_C4 = true
@@ -86,7 +86,7 @@
     type = C4ZrICConst
     variable = u
     
-    #is_3d = true 
+    #is_clad = true 
   []
 []
 
@@ -208,7 +208,7 @@
     type = OxideThicknessZr
     oxide_alpha_pos = position_ox_a
     execute_on ='timestep_end final'
-    is_3d = true
+    is_clad = true
   []
   #[alpha_thickness]
   #  type = AlphaThicknessZr

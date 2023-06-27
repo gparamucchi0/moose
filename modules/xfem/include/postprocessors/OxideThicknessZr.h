@@ -36,5 +36,5 @@ protected:
 
   /// The oxide/alpha interface position
   const PostprocessorValue & _x_ox_a;
-  bool _is_3d;
+  bool _is_clad;
 };

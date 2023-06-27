@@ -123,5 +123,5 @@ protected:
   double _current_pos;
   
   //3d parameter true/false
-  bool _is_3d;
+  bool _is_clad;
 };

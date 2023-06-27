@@ -28,7 +28,7 @@ NodeValueAtXFEMInterface::validParams()
   params.addRequiredParam<VariableName>(
       "level_set_var", "The name of level set variable used to represent the interface");
   //3d parameter
-  params.addParam<bool>("is_3d", false, "3D case");
+  params.addParam<bool>("is_clad", false, "cylinder cladding case");
   //class descritption
   params.addClassDescription("Obtain field values and gradients on the interface.");
   return params;
@@ -42,7 +42,7 @@ NodeValueAtXFEMInterface::NodeValueAtXFEMInterface(const InputParameters & param
         _subproblem.getVariable(_tid, parameters.get<VariableName>("level_set_var")).number()),
     _system(_subproblem.getSystem(getParam<VariableName>("level_set_var"))),
     _solution(*_system.current_local_solution.get()),
-    _is_3d(getParam<bool>("is_3d"))
+    _is_clad(getParam<bool>("is_clad"))
 {  
 }
 
@@ -128,7 +128,7 @@ NodeValueAtXFEMInterface::execute()
    Xcomps.push_back(node->operator()(0));
    Ycomps.push_back(node->operator()(1));
   }
-  if (!_is_3d)
+  if (!_is_clad)
   {
     for (double Xcomp : Xcomps)
     {

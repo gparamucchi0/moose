@@ -50,7 +50,7 @@ protected:
   Real _temperature;
 
   // 3D case true or false
-  bool _is_3d;
+  bool _is_clad;
   // Vacancy flux [/m²/s]
   mutable Real _J_v;
 
