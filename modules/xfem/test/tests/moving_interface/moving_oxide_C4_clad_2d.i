@@ -41,26 +41,25 @@
     value_at_interface_uo = value_uo_ox_a
     is_3d = true 
   []
-  # [moving_line_segments_ox_a]
-  #   type = InterfaceMeshCut2DUserObjectZr
-  #   mesh_file = interface_clad_30deg_2d.e 
-  #   interface_velocity_uo = velocity_ox_a
-  #   is_3d = true 
-  #   clad_rad = 1400
-  #   heal_always = true
-  #   is_C4 = true
-  #   oxa_interface = true
-
-  # []
-
   [moving_line_segments_ox_a]
-    type = InterfaceMeshCut2DUserObject
-    mesh_file = interface_clad_30deg_2d.e 
-   # interface_velocity_uo = velocity_ox_a
-    interface_velocity_function = -11
-    heal_always = true
-
+     type = InterfaceMeshCut2DUserObjectZr
+     mesh_file = interface_clad_30deg_2d.e
+     interface_velocity_uo = velocity_ox_a
+     is_3d = true 
+     clad_rad = 1400
+     heal_always = true
+     is_C4 = true
+     oxa_interface = true
   []
+
+  #[moving_line_segments_ox_a]
+  #  type = InterfaceMeshCut2DUserObject
+  #  mesh_file = interface_clad_30deg_2d.e 
+   # interface_velocity_uo = velocity_ox_a
+  #  interface_velocity_function = -11
+  #  heal_always = true
+
+  #[]
 
   [line_seg_cut_uo]
     type = LevelSetCutUserObject
