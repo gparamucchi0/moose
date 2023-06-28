@@ -27,7 +27,7 @@ NodeValueAtXFEMInterface::validParams()
       "Name of InterfaceMeshCutUserObject that provides cut locations to this UserObject.");
   params.addRequiredParam<VariableName>(
       "level_set_var", "The name of level set variable used to represent the interface");
-  //3d parameter
+  //cylinder cladding parameter
   params.addParam<bool>("is_clad", false, "cylinder cladding case");
   //class descritption
   params.addClassDescription("Obtain field values and gradients on the interface.");
