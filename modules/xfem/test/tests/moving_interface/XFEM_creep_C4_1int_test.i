@@ -11,10 +11,22 @@
     [cmg]
         type = CartesianMeshGenerator
         dim = 2
-        dx = '300'
+        dx = '600'
         dy = '10'
         ix = '151'
         iy = '5'
+    []
+    [top_left_node]
+        type = ExtraNodesetGenerator
+        new_boundary = 'top_left'
+        coord = '0 10'
+        input = cmg
+    []
+    [bottom_left_node]
+        type = ExtraNodesetGenerator
+        new_boundary = 'bottom_left'
+        coord = '0 0'
+        input = top_left_node
     []
 []
 
@@ -171,7 +183,7 @@
     []
     [power_law_creep_a]
         type = PowerLawCreepStressUpdate
-        coefficient = 3.6e-25
+        coefficient = 1.2e-25
         n_exponent = 5.0
         activation_energy = 2.5e5
     []
@@ -214,7 +226,7 @@
     [bottom_disp_x]
         type = DirichletBC
         variable = disp_x
-        boundary = bottom
+        boundary = bottom_left
         value = 0.0
     []
     [bottom_disp_y]
@@ -226,7 +238,7 @@
     [top_disp_x]
         type = DirichletBC
         variable = disp_x
-        boundary = top
+        boundary = top_left
         value = 0.0
     []
     [top_disp_y]

@@ -88,6 +88,8 @@ NodeValueAtXFEMInterface::execute()
 
     if ((*_pl)(*node) != nullptr)
     {
+      //std::cout << "*node = " << *node << std::endl;
+      //std::cout << "(*_pl)(*node) = " << (*_pl)(*node) << std::endl;
       const Elem * elem = getElemContainingPoint(*node, /*positive_level_set = */ true);
 
       if (elem != nullptr)

@@ -8,32 +8,33 @@
 []
 
 [Mesh]
-    [gmg]
-        type = GeneratedMeshGenerator
-        dim = 2
-        xmin = 5e-3
-        xmax = 0.0056
-        ymin = 0
-        ymax = 6e-4
+    #[gmg]
+    #    type = CartesianMeshGenerator
+    #    dim = 2
+    #    dx = '0.0006'
+    #    dy = '0.0006'
+    #    ix = '151'
+    #    iy = '5'
+    #[]
 
-        nx = 300
-        ny = 10
+    [gmg]
+        type = FileMeshGenerator
+        file = cladding_new_bc.e
     []
 
     [top_left_node]
         type = ExtraNodesetGenerator
         new_boundary = 'top_left'
-        coord = '5e-3 6e-4'
+        coord = '0.005 6e-4'
         input = gmg
     []
 
     [bottom_left_node]
         type = ExtraNodesetGenerator
         new_boundary = 'bottom_left'
-        coord = '5e-3 0'
+        coord = '0.005 0'
         input = top_left_node
     []
-
 []
 
 [XFEM]
@@ -51,16 +52,12 @@
     []
     [moving_line_segment_ox_a]
         type = InterfaceMeshCut2DUserObjectZr
-        mesh_file = interface_Q1D_newBC_2.e
+        mesh_file = different_but_why.e
         interface_velocity_function = '-3e-6'
         heal_always = true
         is_C4 = true 
         oxa_interface = true
     []
-    #[velocity_ox_a]
-    #    type = XFEMC4VelocityZrOxA
-    #    value_at_interface_uo = value_uo_ox_a
-    #[]
 []
 
 [Functions]
@@ -80,7 +77,7 @@
     [ic_u]
         type = FunctionIC
         variable = u
-        function = 'if (x<0.00590, 0.0075 ,0.45)'
+        function = 'if (x<0.005590, 0.0075,0.45)'
     []
 []
 
@@ -130,7 +127,7 @@
 [Modules/TensorMechanics/Master]
     [all]
         strain = FINITE
-        use_automatic_differentiation = true
+        #use_automatic_differentiation = true
         incremental = true
         add_variables = true
         generate_output = 'stress_xx stress_yy stress_xy strain_yy strain_xy strain_xx creep_strain_xx creep_strain_yy creep_strain_xy'
@@ -166,42 +163,43 @@
 
 
     [elasticity_tensor_alpha]
-        type = ADComputeIsotropicElasticityTensor
+        type = ComputeIsotropicElasticityTensor
         base_name = 'alpha'
         youngs_modulus = 1.01e11
         poissons_ratio = 0.33
     []
     [elasticity_tensor_oxide]
-        type = ADComputeIsotropicElasticityTensor
+        type = ComputeIsotropicElasticityTensor
         base_name = 'oxide'
         youngs_modulus = 1.75e11
         poissons_ratio = 0.27
     []
     [combined_elasticity_tensor]
-        type = ADLevelSetBiMaterialRankFour
+        type = LevelSetBiMaterialRankFour
         level_set_var = ls_ox_a
         levelset_negative_base = 'alpha'
         levelset_positive_base = 'oxide'
-        prop_name = elasticity_tensor
+        prop_name = Jacobian_mult #elasticity_tensor
     []
 
     [radial_return_stress]
-        type = ADComputeMultipleInelasticStress
+        type = ComputeMultipleInelasticStress
         base_name = 'alpha'
         inelastic_models = 'power_law_creep_a'
+        tangent_operator = elastic
     []
     [power_law_creep_a]
-        type = ADPowerLawCreepStressUpdate
+        type = PowerLawCreepStressUpdate
         coefficient = 1.2e-25
         n_exponent = 5.0
         activation_energy = 2.5e5
     []
     [stress_oxide]
-        type = ADComputeFiniteStrainElasticStress
+        type = ComputeFiniteStrainElasticStress
         base_name = 'oxide'
     []
     [combined_stress]
-        type = ADLevelSetBiMaterialRankTwo
+        type = LevelSetBiMaterialRankTwo
         levelset_negative_base = 'alpha'
         levelset_positive_base = 'oxide'
         level_set_var = ls_ox_a
@@ -209,11 +207,11 @@
     []
 
     [strain_alpha]
-        type = ADComputeFiniteStrain
+        type = ComputeFiniteStrain
         base_name = 'alpha'
     []
     [strain_oxide]
-        type = ADComputeFiniteStrain
+        type = ComputeFiniteStrain
         base_name = 'oxide'
     []
 
@@ -224,46 +222,43 @@
         type = NeumannBC
         variable = u
         value = 0
-        boundary = left
-    []
-    [right_u]
-        type = DirichletBC
-        variable = u
-        boundary = right
-        value = 0.45
+        boundary = 2
     []
 
+    [right_u]
+        type = DirichletBCRightC4Zr
+        variable = u
+        boundary = 4
+    []
     [bottom_left_disp_x]
-        type =ADDirichletBC
+        type = DirichletBC
         variable = disp_x
         boundary = bottom_left
         value = 0.0
     []
     [bottom_disp_y]
-        type = ADDirichletBC
+        type = DirichletBC
         variable = disp_y
-        boundary = bottom
+        boundary = 3
         value = 0.0
     []
-
-   
     [top_disp_y]
-        type = ADDirichletBC
+        type = DirichletBC
         variable = disp_y
-        boundary = top
+        boundary = 1
         value = 0.0
     []
     [top_left_disp_x]
-        type = ADDirichletBC
+        type = DirichletBC
         variable = disp_x
         boundary = top_left
         value = 0.0
     []
     
     [left_pressure]
-        type = ADPressure
+        type = Pressure
         variable = disp_x
-        boundary = left
+        boundary = 2
         factor = 10e6
         function = p   
     []
@@ -277,7 +272,7 @@
     petsc_options_iname = '-pc_type'
     petsc_options_value = 'lu'
     
-    automatic_scaling = true
+    #automatic_scaling = true
     #scaling_group_variables = 'disp_x disp_y; u' 
 
     l_tol = 1e-3
@@ -296,7 +291,7 @@
 [Outputs]
     execute_on = timestep_end
     exodus = true
-    print_linear_residuals = true
+
     [console]
       type = Console
       output_linear = true

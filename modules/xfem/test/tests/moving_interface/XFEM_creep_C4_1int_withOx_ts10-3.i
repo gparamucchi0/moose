@@ -16,6 +16,18 @@
         ix = '151'
         iy = '5'
     []
+    [top_left]
+        type = ExtraNodesetGenerator
+        input = cmg
+        new_boundary = 'top_left'
+        coord = '0 6'
+    []
+   [bottom_left]
+        type = ExtraNodesetGenerator
+        input = top_left
+        new_boundary = 'bottom_left'
+        coord ='0 0'
+    []
 []
 
 [XFEM]
@@ -58,7 +70,7 @@
     [ic_u]
         type = FunctionIC
         variable = u
-        function = 'if (x<295.0, 0.0075 ,0.45)'
+        function = 'if (x<590.0, 0.0075 ,0.45)'
     []
 []
 
@@ -171,10 +183,10 @@
     []
     [power_law_creep_a]
         type = PowerLawCreepStressUpdateChow
+        #u = u
         #coefficient = 3.6e-25
         #n_exponent = 5.0
         #activation_energy = 2.5e5
-        #Lambda = 20
     []
     [stress_oxide]
         type = ComputeFiniteStrainElasticStress
@@ -213,10 +225,10 @@
         boundary = right
         value = 0.45
     []
-    [bottom_disp_x]
+    [bottom_left_disp_x]
         type = DirichletBC
         variable = disp_x
-        boundary = bottom
+        boundary = bottom_left
         value = 0.0
     []
     [bottom_disp_y]
@@ -225,19 +237,17 @@
         boundary = bottom
         value = 0.0
     []
-    [top_disp_x]
+    [top_left_disp_x]
         type = DirichletBC
         variable = disp_x
-        boundary = top
+        boundary = top_left
         value = 0.0
     []
     [top_disp_y]
         type = DirichletBC
-        #type = FunctionDirichletBC
         variable = disp_y
         boundary = top
         value = 0
-        #function = '0.001*(t-20)'
     []
     [left_pressure]
         type = Pressure
@@ -270,7 +280,7 @@
     [O_profile]
       type = LineValueSampler
       use_displaced_mesh = false
-      start_point = '300 2 0'
+      start_point = '600 2 0'
       end_point = '0 2 0'
       sort_by = x
       num_points = 601
@@ -282,30 +292,47 @@
 #[Controls]
 #    [diff]
 #        type = TimePeriod
-#        disable_objects = '*/power_law_creep_a'
+#        disable_objects = '*/TensorMechanics'
 #        start_time = '20'
 #        end_time = '20.3'
 #    []
 #[]
 
+[Preconditioning]
+    [smp]
+        type = SMP
+        full = true 
+    []
+[]
+
 [Executioner]
     type = Transient
-    solve_type = 'NEWTON'
-    #petsc_options = '-pc_svd_monitor'
+    solve_type = 'PJFNK'
+    
+    line_search ='none'
+    #petsc_options = '-snes_ksp'
     petsc_options_iname = '-pc_type'
     petsc_options_value = 'lu'
-    line_search = 'none'
+    
     automatic_scaling = true
     #scaling_group_variables = 'disp_x disp_y; u' 
-    l_tol = 1e-3
-    nl_max_its = 30
-    nl_rel_tol = 2.5e-5
-    nl_abs_tol = 1e-6
+
+    l_tol = 1e-5
+    nl_max_its = 15
+    nl_rel_tol = 2.5e-3
+    nl_abs_tol = 1e-3
   
     start_time = 20
     dt = 0.25 
     num_steps = 100
     max_xfem_update = 1
+
+    #[TimeStepper]
+    #    type = IterationAdaptiveDT
+    #    dt = 0.25
+    #    optimal_iterations = 6
+    #    linear_iteration_ratio = 10
+    #[]
 []
   
   

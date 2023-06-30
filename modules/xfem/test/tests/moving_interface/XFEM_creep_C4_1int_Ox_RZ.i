@@ -1,4 +1,10 @@
-#test for implementing regular creep model on 1 side of the interfac and not the other
+#test for implementing regular creep model on 1 side of the interface and not the other
+
+
+[Problem]
+    coord_type = RZ
+    rz_coord_axis = Y
+[]
 
 [GlobalParams]
     order = FIRST
@@ -8,13 +14,23 @@
 []
 
 [Mesh]
-    [cmg]
-        type = CartesianMeshGenerator
-        dim = 2
-        dx = '600'
-        dy = '6'
-        ix = '151'
-        iy = '5'
+    [gmg]
+        type = FileMeshGenerator
+        file = real_geometry.e
+    []
+
+    [top_left_node]
+        type = ExtraNodesetGenerator
+        new_boundary = 'top_left'
+        coord = '5000 600'
+        input = gmg
+    []
+
+    [bottom_left_node]
+        type = ExtraNodesetGenerator
+        new_boundary = 'bottom_left'
+        coord = '5000 0'
+        input = top_left_node
     []
 []
 
@@ -33,8 +49,8 @@
     []
     [moving_line_segment_ox_a]
         type = InterfaceMeshCut2DUserObjectZr
-        mesh_file = flat_line_1d.e
-        interface_velocity_function = '-3.5'
+        mesh_file = real_cutter.e
+        interface_velocity_function = '-3'
         heal_always = true
         is_C4 = true 
         oxa_interface = true
@@ -44,7 +60,7 @@
 [Functions]
     [p]
         type = PiecewiseLinear
-        x = '0 6'
+        x = '0 600'
         y = '1 1'
     []
 []
@@ -58,7 +74,7 @@
     [ic_u]
         type = FunctionIC
         variable = u
-        function = 'if (x<295.0, 0.0075 ,0.45)'
+        function = 'if (x<5590, 0.0075,0.45)'
     []
 []
 
@@ -108,7 +124,7 @@
 [Modules/TensorMechanics/Master]
     [all]
         strain = FINITE
-        use_automatic_differentiation = false #true
+        #use_automatic_differentiation = true
         incremental = true
         add_variables = true
         generate_output = 'stress_xx stress_yy stress_xy strain_yy strain_xy strain_xx creep_strain_xx creep_strain_yy creep_strain_xy'
@@ -160,7 +176,7 @@
         level_set_var = ls_ox_a
         levelset_negative_base = 'alpha'
         levelset_positive_base = 'oxide'
-        prop_name = Jacobian_mult #elastic_tensor 
+        prop_name = Jacobian_mult #elasticity_tensor
     []
 
     [radial_return_stress]
@@ -171,10 +187,9 @@
     []
     [power_law_creep_a]
         type = PowerLawCreepStressUpdateChow
-        #coefficient = 3.6e-25
-        #n_exponent = 5.0
-        #activation_energy = 2.5e5
-        #Lambda = 20
+        #coefficient = 5.3395e-28
+        #n_exponent = 5.3
+        #activation_energy = 320000
     []
     [stress_oxide]
         type = ComputeFiniteStrainElasticStress
@@ -204,115 +219,83 @@
         type = NeumannBC
         variable = u
         value = 0
-        boundary = left
+        boundary = 2
     []
-    
+
     [right_u]
-        type = DirichletBC
+        type = DirichletBCRightC4Zr
         variable = u
-        boundary = right
-        value = 0.45
+        boundary = 4
     []
-    [bottom_disp_x]
+    [bottom_left_disp_x]
         type = DirichletBC
         variable = disp_x
-        boundary = bottom
+        boundary = bottom_left
         value = 0.0
     []
     [bottom_disp_y]
         type = DirichletBC
         variable = disp_y
-        boundary = bottom
-        value = 0.0
-    []
-    [top_disp_x]
-        type = DirichletBC
-        variable = disp_x
-        boundary = top
+        boundary = 3
         value = 0.0
     []
     [top_disp_y]
         type = DirichletBC
-        #type = FunctionDirichletBC
         variable = disp_y
-        boundary = top
-        value = 0
-        #function = '0.001*(t-20)'
+        boundary = 1
+        value = 0.0
     []
+    [top_left_disp_x]
+        type = DirichletBC
+        variable = disp_x
+        boundary = top_left
+        value = 0.0
+    []
+    
     [left_pressure]
         type = Pressure
         variable = disp_x
-        boundary = left
+        boundary = 2
         factor = 10e6
         function = p   
     []
 []
 
-[Postprocessors]
-    [position_ox_a]
-      type = PositionOfXFEMInterfacePostprocessor
-      value_at_interface_uo = value_uo_ox_a
-      execute_on ='timestep_end final'
-    []
-    [oxide_thickness]
-        type = OxideThicknessZr
-        oxide_alpha_pos = position_ox_a
-        execute_on ='timestep_end final'
-    []
-    [weak_concentration_integral]
-        type = ElementIntegralVariablePostprocessor
-        variable = u
-        execute_on = 'timestep_end final'
+[Preconditioning]
+    [smp]
+        type = SMP
+        full = true
     []
 []
-
-[VectorPostprocessors]
-    [O_profile]
-      type = LineValueSampler
-      use_displaced_mesh = false
-      start_point = '300 2 0'
-      end_point = '0 2 0'
-      sort_by = x
-      num_points = 601
-      outputs = csv
-      variable = 'u'
-    []
-[]
-
-#[Controls]
-#    [diff]
-#        type = TimePeriod
-#        disable_objects = '*/power_law_creep_a'
-#        start_time = '20'
-#        end_time = '20.3'
-#    []
-#[]
 
 [Executioner]
     type = Transient
-    solve_type = 'NEWTON'
-    #petsc_options = '-pc_svd_monitor'
+    solve_type = 'PJFNK'
+    
+    line_search ='none'
     petsc_options_iname = '-pc_type'
     petsc_options_value = 'lu'
-    line_search = 'none'
+    
     automatic_scaling = true
     #scaling_group_variables = 'disp_x disp_y; u' 
-    l_tol = 1e-3
-    nl_max_its = 30
-    nl_rel_tol = 2.5e-5
-    nl_abs_tol = 1e-6
+
+    l_tol = 1e-5
+    nl_max_its = 15
+    nl_rel_tol = 1e-3
+    nl_abs_tol = 1e-3
   
     start_time = 20
-    dt = 0.25 
-    num_steps = 100
+    dt = 0.25
+    num_steps = 180
     max_xfem_update = 1
+
 []
   
   
 [Outputs]
     execute_on = timestep_end
     exodus = true
-    print_linear_residuals = true
+
     [console]
       type = Console
       output_linear = true
