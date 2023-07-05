@@ -25,15 +25,15 @@ CreepChowOldValueTempl<is_ad>::validParams()
       "for more complex simulations. This specific version of the templated class also adds "
       "coupling with the oxygen concentration distribution with Chow and al. model (1982)");
 
-  // Linear strain hardening parameters
+  // Linear strain hardening parameters. Default values are the one of the model 
   params.addCoupledVar("temperature", "Coupled temperature");
-  params.addRequiredCoupledVar("u", "coupled reduced oxygen concentration");
+  params.addRequiredCoupledVar("u", "coupled reduced oxygen concentration");  //couplde variable added to compute the strain rate 
   params.addParam<Real>("coefficient", 5.3395e-28, "Leading coefficient in power-law equation IN Pa^-n");
   params.addParam<Real>("n_exponent", 5.43, "Exponent on effective stress in power-law equation");
   params.addParam<Real>("m_exponent", 0.0, "Exponent on time in power-law equation");
   params.addParam<Real>("activation_energy", 320, "Activation energy");
   params.addParam<Real>("gas_constant", 8.3143, "Universal gas constant");
-  params.addParam<Real>("Lambda", 0.4932, "coefficient in oxygen exp with u --> wt%(O)");
+  params.addParam<Real>("Lambda", 0.4932, "coefficient in oxygen exp with u --> wt%(O)"); //parameter added for the reduced weak oxygen concentration
   params.addParam<Real>("start_time", 0.0, "Start time (if not zero)");
   return params;
 }
@@ -48,7 +48,7 @@ CreepChowOldValueTempl<is_ad>::CreepChowOldValueTempl(
     _u(this->isParamValid("u")
                      ? &this->template coupledGenericValue<is_ad>("u")
                      : nullptr),
-    _u_old(this->coupledValueOld("u")),
+    _u_old(this->coupledValueOld("u")),  //declaration of the old value (previous timestep) form the u coupled variable 
     _coefficient(this->template getParam<Real>("coefficient")),
     _n_exponent(this->template getParam<Real>("n_exponent")),
     _m_exponent(this->template getParam<Real>("m_exponent")),
@@ -72,11 +72,11 @@ CreepChowOldValueTempl<is_ad>::computeStressInitialize(
     const GenericRankFourTensor<is_ad> & /*elasticity_tensor*/)
 {
   if (_temperature)
-    _exponential = std::exp(-_activation_energy / (_gas_constant * (*_temperature)[_qp]));
+    _exponential = std::exp(-_activation_energy / (_gas_constant * (*_temperature)[_qp]));  
   
   if (_u)
-    _exp_ox = std::exp(-_Lambda * (_u_old[_qp])/(1 + _u_old[_qp]));
-
+    _exp_ox = std::exp(-_Lambda * (_u_old[_qp])/(1 + _u_old[_qp])); //computation of the exponential part with the oxygen dependence at quadrature points
+                                                                    //during the initialization
   _exp_time = std::pow(_t - _start_time, _m_exponent);
 }
 
@@ -88,7 +88,7 @@ CreepChowOldValueTempl<is_ad>::computeResidualInternal(
 {
   const ScalarType stress_delta = effective_trial_stress - _three_shear_modulus * scalar;
   const ScalarType creep_rate =
-      _coefficient * std::pow(stress_delta, _n_exponent) * _exponential * _exp_time * _exp_ox;
+      _coefficient * std::pow(stress_delta, _n_exponent) * _exponential * _exp_time * _exp_ox;   //adding _exp_ox to the residual inernals 
   return creep_rate * _dt - scalar;
 }
 
@@ -100,7 +100,7 @@ CreepChowOldValueTempl<is_ad>::computeDerivative(
   const GenericReal<is_ad> stress_delta = effective_trial_stress - _three_shear_modulus * scalar;
   const GenericReal<is_ad> creep_rate_derivative =
       -_coefficient * _three_shear_modulus * _n_exponent *
-      std::pow(stress_delta, _n_exponent - 1.0) * _exponential * _exp_time * _exp_ox;
+      std::pow(stress_delta, _n_exponent - 1.0) * _exponential * _exp_time * _exp_ox;  //adding _exp_ox to the derivative
   return creep_rate_derivative * _dt - 1.0;
 }
 

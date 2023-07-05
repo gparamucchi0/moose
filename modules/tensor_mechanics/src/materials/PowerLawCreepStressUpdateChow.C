@@ -23,15 +23,15 @@ PowerLawCreepStressUpdateChowTempl<is_ad>::validParams()
       "for more complex simulations. This specific version of the templated class also adds "
       "coupling with the oxygen concentration distribution with Chow and al. model (1982)");
 
-  // Linear strain hardening parameters
+  // Linear strain hardening parameters. Default values are the one of the model
   params.addCoupledVar("temperature", "Coupled temperature");
-  params.addCoupledVar("u", "coupled reduced oxygen concentration");
+  params.addCoupledVar("u", "coupled reduced oxygen concentration"); //coupled variable added to compute the strain rate 
   params.addParam<Real>("coefficient", 5.3395e-28, "Leading coefficient in power-law equation IN Pa^-n");
   params.addParam<Real>("n_exponent", 5.43, "Exponent on effective stress in power-law equation");
   params.addParam<Real>("m_exponent", 0.0, "Exponent on time in power-law equation");
   params.addParam<Real>("activation_energy", 320000, "Activation energy");
   params.addParam<Real>("gas_constant", 8.3143, "Universal gas constant");
-  params.addParam<Real>("Lambda", 0.4932, "coefficient in oxygen exp with u --> wt%(O)");
+  params.addParam<Real>("Lambda", 0.4932, "coefficient in oxygen exp with u --> wt%(O)");  //parameter added for the reduced weak oxygen concentration
   params.addParam<Real>("start_time", 0.0, "Start time (if not zero)");
   return params;
 }
@@ -72,8 +72,8 @@ PowerLawCreepStressUpdateChowTempl<is_ad>::computeStressInitialize(
     _exponential = std::exp(-_activation_energy / (_gas_constant * (*_temperature)[_qp]));
   
   if (_u)
-    _exp_ox = std::exp(-_Lambda * ((*_u)[_qp])/(1 + (*_u)[_qp]));
-
+    _exp_ox = std::exp(-_Lambda * ((*_u)[_qp])/(1 + (*_u)[_qp]));  //computation of the exponential part with the oxygen dependence at quadrature points  
+                                                                   // during the initialization
   _exp_time = std::pow(_t - _start_time, _m_exponent);
 }
 
@@ -85,7 +85,7 @@ PowerLawCreepStressUpdateChowTempl<is_ad>::computeResidualInternal(
 {
   const ScalarType stress_delta = effective_trial_stress - _three_shear_modulus * scalar;
   const ScalarType creep_rate =
-      _coefficient * std::pow(stress_delta, _n_exponent) * _exponential * _exp_time * _exp_ox;
+      _coefficient * std::pow(stress_delta, _n_exponent) * _exponential * _exp_time * _exp_ox; //adding _exp_ox to the residual inernals 
   return creep_rate * _dt - scalar;
 }
 
@@ -97,7 +97,7 @@ PowerLawCreepStressUpdateChowTempl<is_ad>::computeDerivative(
   const GenericReal<is_ad> stress_delta = effective_trial_stress - _three_shear_modulus * scalar;
   const GenericReal<is_ad> creep_rate_derivative =
       -_coefficient * _three_shear_modulus * _n_exponent *
-      std::pow(stress_delta, _n_exponent - 1.0) * _exponential * _exp_time * _exp_ox;
+      std::pow(stress_delta, _n_exponent - 1.0) * _exponential * _exp_time * _exp_ox;   //adding _exp_ox to the derivative
   return creep_rate_derivative * _dt - 1.0;
 }
 

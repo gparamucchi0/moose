@@ -16,21 +16,22 @@
     #    ix = '151'
     #    iy = '5'
     #[]
-
-    [gmg]
-        type = FileMeshGenerator
-        file = cladding_new_bc.e
+                                  #                           (0.005,0.0006) ___________(0.0056,0.0006)
+                                  #                                         |__|__|__|__|
+    [gmg]                         #                                         |__|__|__|__|
+        type = FileMeshGenerator  #                                         |__|__|__|__|
+        file = cladding_new_bc.e  #imported mesh (0,0) <------ 0.005 ------>|__|__|__|__|(0.0056,0)
     []
 
     [top_left_node]
-        type = ExtraNodesetGenerator
+        type = ExtraNodesetGenerator  #adding a node on the top left to fix the displacements
         new_boundary = 'top_left'
         coord = '0.005 6e-4'
         input = gmg
     []
 
     [bottom_left_node]
-        type = ExtraNodesetGenerator
+        type = ExtraNodesetGenerator #adding a node on the bottom left to fix the displacements
         new_boundary = 'bottom_left'
         coord = '0.005 0'
         input = top_left_node
@@ -51,9 +52,9 @@
         level_set_var = ls_ox_a 
     []
     [moving_line_segment_ox_a]
-        type = InterfaceMeshCut2DUserObjectZr
-        mesh_file = different_but_why.e
-        interface_velocity_function = '-3e-6'
+        type = InterfaceMeshCut2DUserObjectZr  #Class taking a mesh cutter flat and that position the mesh cutter 
+        mesh_file = different_but_why.e        #at the right position depending on the number of phases. 
+        interface_velocity_function = '-3e-6'  #Here we have 1 interface ox/alpha and the velocity is constant
         heal_always = true
         is_C4 = true 
         oxa_interface = true
@@ -62,14 +63,14 @@
 
 [Functions]
     [p]
-        type = PiecewiseLinear
-        x = '0 6e-4'
+        type = PiecewiseLinear  #function for the definition of the pressure along the left side of the mesh. 
+        x = '0 6e-4'            #Value of y is unity but is scaled in the BCs block
         y = '1 1'
     []
 []
 
 [Variables]
-    [u]
+    [u]  # reduced weak oxygen concentration 
     []
 []
 
@@ -77,7 +78,7 @@
     [ic_u]
         type = FunctionIC
         variable = u
-        function = 'if (x<0.005590, 0.0075,0.45)'
+        function = 'if (x<0.005590, 0.0075,0.45)'    #Step function for u(t=0) changing at 590 um of the cladding
     []
 []
 
@@ -88,8 +89,8 @@
     []
 []
 
-[Constraints]
-    [u_constraint_ox_a]
+[Constraints]              #The Constraints block will maintain the value of the coupled variables disp_x and disp_y 
+    [u_constraint_ox_a]    #as well as the reduced weak oxygen concentration
         type = XFEMEqualValueAtInterfaceC4aox
         geometric_cut_userobject = 'moving_line_segment_ox_a'
         use_displaced_mesh = false
@@ -114,9 +115,9 @@
 
 [Kernels]
     [diff]
-        type = MatDiffusion
+        type = MatDiffusion  #Kernel solving Fick's 2nd law 
         variable = u
-        diffusivity = 'diffusion_coefficient'
+        diffusivity = 'diffusion_coefficient' #Diffusion coefficient is defined in the Materials block
     []
     [time]
         type = TimeDerivative
@@ -126,9 +127,9 @@
 
 [Modules/TensorMechanics/Master]
     [all]
-        strain = FINITE
-        #use_automatic_differentiation = true
-        incremental = true
+        strain = FINITE  #Finite strain formlation necessary for the ComputeMultipleInelasticStress
+        #use_automatic_differentiation = true   #can be enabled or not but need to change all the 
+        incremental = true  #                   #the Materials objects with AD....
         add_variables = true
         generate_output = 'stress_xx stress_yy stress_xy strain_yy strain_xy strain_xx creep_strain_xx creep_strain_yy creep_strain_xy'
     []
@@ -143,71 +144,73 @@
 []
 
 [Materials]
-    [diffusivity_alpha]
+    [diffusivity_alpha]     #custom diffusion coefficient for the alpha phase 
         type = C4DiffusionCoefAlpha
-        prop_names = alpha_diffusion_coefficient
+        prop_names = alpha_diffusion_coefficient  #name is important for the LevelSet material properties
     []
-    [diffusivity_oxide]
+    [diffusivity_oxide]     #generic diffusion coefficient for the oxide 
         type = GenericConstantMaterial
         prop_names = oxide_diffusion_coefficient
-        prop_values = 10e-6
+        prop_values = 10e-6 #in m^2/s
     []
     [diff_combined]
-        type = LevelSetBiMaterialReal
-        levelset_negative_base = 'alpha'
-        levelset_positive_base = 'oxide'
-        level_set_var = ls_ox_a
+        type = LevelSetBiMaterialReal    #LevelSet Bimaterial object that will give the alpha diffusion coefficent REAL value 
+        levelset_negative_base = 'alpha' #when the values of the levelset Auxvariable is >0 and the oxide diffusion coefficient 
+        levelset_positive_base = 'oxide' #REAL value in the other case. Then the material property is named 'diffusion coefficient' 
+        level_set_var = ls_ox_a          #and used by the MatDiffusion kernel
         prop_name = diffusion_coefficient
         outputs = exodus
     []
 
 
     [elasticity_tensor_alpha]
-        type = ComputeIsotropicElasticityTensor
-        base_name = 'alpha'
+        type = ComputeIsotropicElasticityTensor  #generic Elasticity tensor for the alpha phase 
+        base_name = 'alpha'  #name of the base will serve to have a combined LevelSet material property
         youngs_modulus = 1.01e11
         poissons_ratio = 0.33
     []
     [elasticity_tensor_oxide]
-        type = ComputeIsotropicElasticityTensor
-        base_name = 'oxide'
+        type = ComputeIsotropicElasticityTensor  #generic Elasticity tensor for the oxide phase 
+        base_name = 'oxide'  #name of the base will serve to have a combined LevelSet material property
         youngs_modulus = 1.75e11
         poissons_ratio = 0.27
     []
     [combined_elasticity_tensor]
-        type = LevelSetBiMaterialRankFour
-        level_set_var = ls_ox_a
-        levelset_negative_base = 'alpha'
-        levelset_positive_base = 'oxide'
+        type = LevelSetBiMaterialRankFour #LevelSet Bimaterial object that will give the alpha elasticity RANK FOUR tensor
+        level_set_var = ls_ox_a           #when the values of the levelset Auxvariable is >0 and the oxide elasticity RANK FOUR 
+        levelset_negative_base = 'alpha'  #tensor in the other case.
+        levelset_positive_base = 'oxide'  #Depending if is_AD or not the name has to be Jacobian_mult or elasticity_tensor respectively
+                                          #to be understood by the Tensor Mechanics Action
         prop_name = Jacobian_mult #elasticity_tensor
     []
 
     [radial_return_stress]
-        type = ComputeMultipleInelasticStress
-        base_name = 'alpha'
+        type = ComputeMultipleInelasticStress   #Computation of inelastic stress with the creep model 
+        base_name = 'alpha'                     #name of the base will serve to have a combined LevelSet material property
         inelastic_models = 'power_law_creep_a'
-        tangent_operator = elastic
+        tangent_operator = elastic              #tangent operator is elastic because the model has elasticity tensor 
     []
     [power_law_creep_a]
-        type = PowerLawCreepStressUpdate
-        coefficient = 1.2e-25
-        n_exponent = 5.0
-        activation_energy = 2.5e5
+        type = PowerLawCreepStressUpdateChow    #Modified creep model taking into account the oxygen content with Chow and al. model 
+        u= u                                    #need to declare the reduced weak oxygen concentration 
+        #coefficient = 1.2e-25                  #The default parameters are already those of the model 
+        #n_exponent = 5.0                       #CreepChowOldVlue is the same creep model than the one used here but with an attempt to use 
+        #activation_energy = 2.5e5              #the CoupledValueOld formulation with computation of the creep rate with u from the previous timestep
     []
     [stress_oxide]
-        type = ComputeFiniteStrainElasticStress
-        base_name = 'oxide'
+        type = ComputeFiniteStrainElasticStress  #Computation of elastic stress with the creep model 
+        base_name = 'oxide'                      #name of the base will serve to have a combined LevelSet material property
     []
     [combined_stress]
-        type = LevelSetBiMaterialRankTwo
-        levelset_negative_base = 'alpha'
-        levelset_positive_base = 'oxide'
-        level_set_var = ls_ox_a
+        type = LevelSetBiMaterialRankTwo   #LevelSet Bimaterial object that will give the alpha stress RANK TWO tensor
+        levelset_negative_base = 'alpha'   #when the values of the levelset Auxvariable is >0 and the oxide stress RANK TWO
+        levelset_positive_base = 'oxide'   #tensor in the other case.
+        level_set_var = ls_ox_a            #The name of the Material property as to be stress even if is_AD
         prop_name = stress
     []
 
     [strain_alpha]
-        type = ComputeFiniteStrain
+        type = ComputeFiniteStrain        #Computation of finite strain needed to compute the stresses in both phases 
         base_name = 'alpha'
     []
     [strain_oxide]
@@ -219,19 +222,19 @@
 
 [BCs]
     [left_u]
-        type = NeumannBC
+        type = NeumannBC     #  [du/dx]x=0.005 = 0
         variable = u
         value = 0
         boundary = 2
     []
 
     [right_u]
-        type = DirichletBCRightC4Zr
+        type = DirichletBCRightC4Zr   # custom BC taking into account the weak formulatio of the problem 
         variable = u
         boundary = 4
     []
     [bottom_left_disp_x]
-        type = DirichletBC
+        type = DirichletBC   #blocking all displacements on the bottom_left node to blcok rigid body motion
         variable = disp_x
         boundary = bottom_left
         value = 0.0
@@ -249,14 +252,14 @@
         value = 0.0
     []
     [top_left_disp_x]
-        type = DirichletBC
+        type = DirichletBC  #blocking all displacements on the top_left node to blcok rigid body motion
         variable = disp_x
         boundary = top_left
         value = 0.0
     []
     
     [left_pressure]
-        type = Pressure
+        type = Pressure    #Pressure term of 10e6 Pa on the inside surface of the cladding 
         variable = disp_x
         boundary = 2
         factor = 10e6
@@ -272,7 +275,7 @@
     petsc_options_iname = '-pc_type'
     petsc_options_value = 'lu'
     
-    #automatic_scaling = true
+    automatic_scaling = true
     #scaling_group_variables = 'disp_x disp_y; u' 
 
     l_tol = 1e-3

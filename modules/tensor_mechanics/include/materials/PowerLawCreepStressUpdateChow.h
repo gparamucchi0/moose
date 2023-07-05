@@ -62,7 +62,7 @@ protected:
   /// Temperature variable value
   const GenericVariableValue<is_ad> * const _temperature;
 
-  /// u (reduced oxygen concentration over C(Zr)) 
+  /// u (reduced weak oxygen concentration over C(Zr)) defined as a generic variable value i.e computed at the same timestep
   const GenericVariableValue<is_ad> * const _u;
 
   /// Leading coefficient
