@@ -233,38 +233,47 @@
         variable = u
         boundary = 4
     []
-    [bottom_left_disp_x]
-        type = DirichletBC   #blocking all displacements on the bottom_left node to blcok rigid body motion
-        variable = disp_x
-        boundary = bottom_left
-        value = 0.0
-    []
+    #[bottom_left_disp_x]
+    #    type = DirichletBC   #blocking all displacements on the bottom_left node to blcok rigid body motion
+    #    variable = disp_x
+    #    boundary = bottom_left
+    #    value = 0.0
+    #[]
     [bottom_disp_y]
         type = DirichletBC
         variable = disp_y
         boundary = 3
         value = 0.0
     []
-    [top_disp_y]
+    [bottom_disp_x]
         type = DirichletBC
+        variable = disp_x
+        boundary = 3
+        value = 0.0
+    []
+    [top_disp_y]
+        type = FunctionDirichletBC
         variable = disp_y
         boundary = 1
-        value = 0.0
+        function = '0.0006*0.45*t*0.001'
     []
-    [top_left_disp_x]
-        type = DirichletBC  #blocking all displacements on the top_left node to blcok rigid body motion
-        variable = disp_x
-        boundary = top_left
-        value = 0.0
-    []
+    #[top_left_disp_x]
+    #    type = DirichletBC  #blocking all displacements on the top_left node to blcok rigid body motion
+    #    variable = disp_x
+    #    boundary = top_left
+    #    value = 0.0
+    #[]
     
-    [left_pressure]
-        type = Pressure    #Pressure term of 10e6 Pa on the inside surface of the cladding 
-        variable = disp_x
-        boundary = 2
-        factor = 10e6
-        function = p   
-    []
+    #[left_pressure]
+    #    type = Pressure    #Pressure term of 10e6 Pa on the inside surface of the cladding 
+    #    variable = disp_x
+    #    boundary = 2
+    #    factor = 10e6
+    #    function = p   
+    #[]
+[]
+[Debug]
+    show_var_residual_norms = true
 []
 
 [Executioner]
@@ -285,14 +294,14 @@
   
     start_time = 20
     dt = 0.25 
-    num_steps = 10
+    num_steps = 100
     max_xfem_update = 1
 
 []
   
   
 [Outputs]
-    execute_on = timestep_end
+    execute_on = 'timestep_end failed'
     exodus = true
 
     [console]
