@@ -94,7 +94,7 @@ C4DiffusionCoefAlphaTempl<is_ad>::C4DiffusionCoefAlphaTempl(
     diffusivity_alpha = 11.64* exp(-54881/1.987/_temperature) * 1e8;
   }
 
-  _prop_values[0] = diffusivity_alpha;
+  _prop_values[0] = diffusivity_alpha*1e-12;
 }
 
 template <bool is_ad>

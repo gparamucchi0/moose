@@ -67,6 +67,10 @@
         x = '0 6e-4'            #Value of y is unity but is scaled in the BCs block
         y = '1 1'
     []
+    [ic_u]
+        type = ParsedFunction
+        expression = 'if (x<0.005590, 0.0075,0.45)'
+    []
 []
 
 [Variables]
@@ -78,7 +82,7 @@
     [ic_u]
         type = FunctionIC
         variable = u
-        function = 'if (x<0.005590, 0.0075,0.45)'    #Step function for u(t=0) changing at 590 um of the cladding
+        function =  ic_u   #Step function for u(t=0) changing at 590 um of the cladding
     []
 []
 
@@ -86,6 +90,10 @@
     [ls_ox_a]
         order = FIRST
         family = LAGRANGE
+    []
+    [sig_b]
+        order = CONSTANT
+        family = MONOMIAL
     []
 []
 
@@ -140,6 +148,13 @@
         type = MeshCutLevelSetAux
         mesh_cut_user_object = 'moving_line_segment_ox_a'
         variable = ls_ox_a
+    []
+    [sig_b]
+        type = LevelSetBiBurstStressAux
+        variable = sig_b
+        level_set_var = ls_ox_a
+        u_IC = ic_u
+        u = u 
     []
 []
 
