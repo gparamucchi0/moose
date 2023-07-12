@@ -159,9 +159,9 @@ XFEMC4VelocityZrOxA::computeMovingInterfaceVelocity(dof_id_type point_id, RealVe
 
   _J_v = 1e6 * mobil_v * potential * (con_v_ox_w - con_v_ox_m * pow(eta, 2)) / (1 - pow(eta, 2));
 
-  const Real J_o = -diffusivity_alpha * con_zr * (-grad_negative(0) * 1e-6); //* normal ;
+  const Real J_o = -diffusivity_alpha * con_zr * (-grad_negative * 1e-6)* normal ;
 
-  //std::cout << "ox_a_grad_negative : " << grad_negative << std::endl;
+  std::cout << "ox_a_grad_negative : " << grad_negative << std::endl;
   //std::cout << "ox_a_grad_positive : " << grad_positive << std::endl;
   //std::cout << "ox_a normal : " << normal << std::endl;
   //std::cout << "ox_a J_v : " << _J_v << std::endl;
@@ -178,6 +178,6 @@ XFEMC4VelocityZrOxA::computeMovingInterfaceVelocity(dof_id_type point_id, RealVe
     return v_ox_a_init;
   }
   else
-    //std::cout << "Oxide-alpha velocity : " << v_ox_a << std::endl;
+    std::cout << "Oxide-alpha velocity : " << v_ox_a << std::endl;
   return v_ox_a;
 }

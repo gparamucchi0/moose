@@ -20,22 +20,23 @@
                                   #                                         |__|__|__|__|
     [gmg]                         #                                         |__|__|__|__|
         type = FileMeshGenerator  #                                         |__|__|__|__|
-        file = cladding_new_bc.e  #imported mesh (0,0) <------ 0.005 ------>|__|__|__|__|(0.0056,0)
+        file = dog_bone_updated.e #imported mesh (0,0) <------ 0.005 ------>|__|__|__|__|(0.0056,0)
     []
 
-    [top_left_node]
-        type = ExtraNodesetGenerator  #adding a node on the top left to fix the displacements
-        new_boundary = 'top_left'
-        coord = '0.005 6e-4'
-        input = gmg
-    []
+    #[top_left_node]
+    #    type = ExtraNodesetGenerator  #adding a node on the top left to fix the displacements
+    #    new_boundary = 'top_left'
+    #    coord = '0.005 6e-4'
+    #    input = gmg
+    #[]
 
-    [bottom_left_node]
-        type = ExtraNodesetGenerator #adding a node on the bottom left to fix the displacements
-        new_boundary = 'bottom_left'
-        coord = '0.005 0'
-        input = top_left_node
-    []
+    #[bottom_left_node]
+    #    type = ExtraNodesetGenerator #adding a node on the bottom left to fix the displacements
+    #    new_boundary = 'bottom_left'
+    #    coord = '0.005 0'
+    #    input = top_left_node
+    #[]
+    #uniform_refine = 1
 []
 
 [XFEM]
@@ -53,7 +54,7 @@
     []
     [moving_line_segment_ox_a]
         type = InterfaceMeshCut2DUserObjectZr  #Class taking a mesh cutter flat and that position the mesh cutter 
-        mesh_file = different_but_why.e        #at the right position depending on the number of phases. 
+        mesh_file = dog_bone_interface.e        #at the right position depending on the number of phases. 
         interface_velocity_function = '-3e-6'  #Here we have 1 interface ox/alpha and the velocity is constant
         heal_always = true
         is_C4 = true 
@@ -69,7 +70,7 @@
     []
     [ic_u]
         type = ParsedFunction
-        expression = 'if (x<0.005590, 0.0075,0.45)'
+        expression = 'if (x>0.005052, 0.0075,0.45)'
     []
 []
 
@@ -143,7 +144,7 @@
         #use_automatic_differentiation = true   #can be enabled or not but need to change all the 
         incremental = true  #                   #the Materials objects with AD....
         add_variables = true
-        generate_output = 'stress_xx stress_yy stress_xy strain_yy strain_xy strain_xx creep_strain_xx creep_strain_yy creep_strain_xy'
+        generate_output = 'stress_xx stress_yy stress_xy strain_yy strain_xx creep_strain_xx creep_strain_yy'
     []
 []
 
@@ -255,7 +256,7 @@
     [right_u]
         type = DirichletBCRightC4Zr   # custom BC taking into account the weak formulatio of the problem 
         variable = u
-        boundary = 4
+        boundary = 1
     []
     #[bottom_left_disp_x]
     #    type = DirichletBC   #blocking all displacements on the bottom_left node to blcok rigid body motion
@@ -266,25 +267,25 @@
     [bottom_disp_y]
         type = DirichletBC
         variable = disp_y
-        boundary = 3
+        boundary = 4
         value = 0.0
     []
     [bottom_disp_x]
         type = DirichletBC
         variable = disp_x
-        boundary = 3
+        boundary = 4
         value = 0.0
     []
     [top_disp_x]
         type = DirichletBC
         variable = disp_x
-        boundary = 1
+        boundary = 3
         value = 0.0
     []
     [top_disp_y]
         type = FunctionDirichletBC
         variable = disp_y
-        boundary = 1
+        boundary = 3
         function = '0.0006*0.45*(t-20)*0.001*0.5'
     []
     #[top_left_disp_x]

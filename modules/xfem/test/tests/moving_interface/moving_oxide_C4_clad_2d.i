@@ -43,13 +43,14 @@
   []
   [moving_line_segments_ox_a]
     type = InterfaceMeshCut2DUserObjectZr
-    mesh_file = interface_other_curvature_clad_2d.e
+    mesh_file = interface_clad_30deg_2d.e
     interface_velocity_uo = velocity_ox_a
-    #is_clad = true 
-    #clad_rad = 1400
+    #interface_velocity_function = '-0.1'
+    is_clad = true 
+    clad_rad = 1400
     heal_always = true
-    #is_C4 = true
-    #oxa_interface = true
+    is_C4 = true
+    oxa_interface = true
 
   []
   #[value_uo_a_b]
