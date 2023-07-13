@@ -38,7 +38,7 @@
     type = LineSegmentCutUserObject
     cut_data = '10  2.5  4.8  2.5'
     time_start_cut = 0.0
-    time_end_cut = 4.0
+    time_end_cut = 2.0
     #heal_always = true
 
   []
