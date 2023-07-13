@@ -26,7 +26,7 @@ InterfaceMeshCut2DUserObjectLS::InterfaceMeshCut2DUserObjectLS(const InputParame
   for (const auto & elem : _cutter_mesh->element_ptr_range())
     if (elem->type() != EDGE2)
       mooseError(
-          "InterfaceMeshCut2DUserObject currently only supports EDGE2 element in the cut mesh.");
+          "InterfaceMeshCut2DUserObjectLS currently only supports EDGE2 element in the cut mesh.");
 }
 
 void
@@ -67,7 +67,7 @@ InterfaceMeshCut2DUserObjectLS::nodeNormal(const unsigned int & node_id)
   unsigned int num = _node_to_elem_map[node_id].size();
 
   if (num == 0)
-    mooseError("InterfaceMeshCut2DUserObject, the node is not found in node_to_elem_map in "
+    mooseError("InterfaceMeshCut2DUserObjectLS, the node is not found in node_to_elem_map in "
                "calculting its normal.");
 
   return normal / num;
@@ -129,7 +129,7 @@ bool
 InterfaceMeshCut2DUserObjectLS::cutElementByGeometry(const Elem * /* elem*/,
                                                    std::vector<Xfem::CutFace> & /*cut_faces*/) const
 {
-  mooseError("invalid method for InterfaceMeshCut2DUserObject");
+  mooseError("invalid method for InterfaceMeshCut2DUserObjectLS");
   return false;
 }
 
@@ -138,7 +138,7 @@ InterfaceMeshCut2DUserObjectLS::cutFragmentByGeometry(
     std::vector<std::vector<Point>> & /*frag_edges*/,
     std::vector<Xfem::CutEdge> & /*cut_edges*/) const
 {
-  mooseError("cutFragmentByGeometry not yet implemented for InterfaceMeshCut2DUserObject");
+  mooseError("cutFragmentByGeometry not yet implemented for InterfaceMeshCut2DUserObjectLS");
   return false;
 }
 
@@ -147,7 +147,7 @@ InterfaceMeshCut2DUserObjectLS::cutFragmentByGeometry(
     std::vector<std::vector<Point>> & /*frag_faces*/,
     std::vector<Xfem::CutFace> & /*cut_faces*/) const
 {
-  mooseError("invalid method for InterfaceMeshCut2DUserObject");
+  mooseError("invalid method for InterfaceMeshCut2DUserObjectLS");
   return false;
 }
 

@@ -15,7 +15,7 @@ registerMooseObject("XFEMApp", InterfaceMeshCut2DUserObjectZr);
 InputParameters
 InterfaceMeshCut2DUserObjectZr::validParams()
 {
-  InputParameters params = InterfaceMeshCut2DUserObject::validParams();
+  InputParameters params = InterfaceMeshCut2DUserObjectLS::validParams();
   //required parameters
   //ONLY PUT A LINE OR SPLINE 1D MESH TALLER THAN THE MESH OTHERWISE IT WOULD BE A CRACK
   //optionnal parameters from the C4 model
@@ -34,7 +34,7 @@ InterfaceMeshCut2DUserObjectZr::validParams()
 }
 
 InterfaceMeshCut2DUserObjectZr::InterfaceMeshCut2DUserObjectZr(const InputParameters & parameters)
-  : InterfaceMeshCut2DUserObject(parameters), _is_C4(getParam<bool>("is_C4")),
+  : InterfaceMeshCut2DUserObjectLS(parameters), _is_C4(getParam<bool>("is_C4")),
     _is_expcomp(getParam<bool>("is_expcomp")),
     _ab_interface(getParam<bool>("ab_interface")),
     _oxa_interface(getParam<bool>("oxa_interface")),

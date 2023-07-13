@@ -1,6 +1,6 @@
 [GlobalParams]
-  order = FIRST
-  family = LAGRANGE
+  #order = FIRST
+  #family = LAGRANGE
   displacements = 'disp_x disp_y'
 []
 
@@ -34,29 +34,27 @@
   #  heal_always = true
   #  execute_on = 'XFEM_MARK'
   #[]
-  [line_seg_cut_uo]
-    type = LineSegmentCutUserObject
-    cut_data = '10  2.5  4.8  2.5'
-    time_start_cut = 0.0
-    time_end_cut = 2.0
-    #heal_always = true
-
-  []
+  #[interface]
+  #  type = LevelSetCutUserObject
+  #  level_set_var = ls
+  #[]
   [cut_mesh]
-    type = LineSegmentCutUserObject
-    cut_data = '4 0 6 5'
-    time_start_cut = 0
-    time_end_cut = 0
+    type = MeshCut2DFunctionUserObject
+    mesh_file = make_edge_crack_in.e
+    growth_direction_x = growth_func_x
+    growth_direction_y = growth_func_y
+    growth_rate = growth_func_v
+    #heal_always = true
   []
     
 []
 
 [Functions]
-  [ls_func]
-    type = ParsedFunction
-    expression = 'x-5'
-  []
-  [./pull]
+  #[ls_func]
+  #  type = ParsedFunction
+  #  expression = 'x-5'
+  #[]
+  [pull]
     type = PiecewiseLinear
     x='0  5   10'
     y='0  0.02 0.1'
@@ -64,6 +62,18 @@
   [vel]
     type = ParsedFunction
     expression = '0.0'
+  []
+  [growth_func_x]
+    type = ParsedFunction
+    expression = 2*t
+  []
+  [growth_func_y]
+    type = ParsedFunction
+    expression = '0'
+  []
+  [growth_func_v]
+    type = ParsedFunction
+    expression = 0.1*t
   []
 []
 
@@ -86,35 +96,35 @@
   []
 []
 
-[AuxVariables]
-  [ls]
-  []
-[]
+#[AuxVariables]
+#  [ls]
+#  []
+#[]
 
-[AuxKernels]
-  [ls]
-    type = FunctionAux
-    variable = ls
-    function = ls_func
-  []
-[]
+#[AuxKernels]
+#  [ls]
+#    type = FunctionAux
+#    variable = ls
+#    function = ls_func
+#  []
+#[]
 
-[Constraints]
-  [./dispx_constraint]
-    type = XFEMSingleVariableConstraint
-    use_displaced_mesh = true
-    variable = disp_x
-    alpha = 1e8
-    geometric_cut_userobject = 'cut_mesh'
-  []
-  [dispy_constraint]
-    type = XFEMSingleVariableConstraint
-    use_displaced_mesh = true
-    variable = disp_y
-    alpha = 1e8
-    geometric_cut_userobject = 'cut_mesh'
-  []
-[]
+#[Constraints]
+#  [./dispx_constraint]
+#    type = XFEMSingleVariableConstraint
+#    use_displaced_mesh = true
+#    variable = disp_x
+#    alpha = 1e8
+#    geometric_cut_userobject = 'interface'
+#  []
+#  [dispy_constraint]
+#    type = XFEMSingleVariableConstraint
+#    use_displaced_mesh = true
+#    variable = disp_y
+#    alpha = 1e8
+#    geometric_cut_userobject = 'interface'
+#  []
+#[]
 [BCs]
   [bottom_x]
     type = DirichletBC
@@ -140,8 +150,12 @@
   type = Transient
 
   solve_type = 'PJFNK'
-  petsc_options_iname = '-pc_type'
-  petsc_options_value = 'lu'
+  #petsc_options_iname = '-pc_type'
+  #petsc_options_value = 'lu'
+  petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_hypre_type -pc_hypre_boomeramg_max_iter'
+  petsc_options_value = '201                hypre    boomeramg      8'
+
+  line_search = 'none'
 
   l_max_its = 20
   l_tol = 1e-3

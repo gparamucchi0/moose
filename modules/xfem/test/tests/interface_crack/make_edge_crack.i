@@ -7,16 +7,16 @@
   [line]
     type = GeneratedMeshGenerator
     dim = 1
-    nx = 3
-    xmin = -.301
-    xmax = 0.301
+    nx = 4
+    xmin = 9.5
+    xmax = 10.1
     # xmax = 0.401
   []
 [offset]
   type =TransformGenerator
   input = line
   transform = TRANSLATE
-  vector_value = '0 0.5 0'
+  vector_value = '0 2.5 0'
 []
 []
 [Problem]

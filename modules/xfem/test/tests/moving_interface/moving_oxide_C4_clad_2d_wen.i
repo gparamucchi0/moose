@@ -8,7 +8,6 @@
 
 # if change ix and iy (so dy), must change cut_data in MovingLineSegmentCutSetUO, ymax in weight_gain_space_integral and start/end_point in O_profile vector PP
 
-
 [GlobalParams]
   order = FIRST
   family = LAGRANGE
@@ -23,7 +22,6 @@
 []
 
 [XFEM]
-  geometric_cut_userobjects = 'moving_line_segments_ox_a'
   qrule = volfrac
   output_cut_plane = true
 []
@@ -35,32 +33,39 @@
     interface_mesh_cut_userobject = 'moving_line_segments_ox_a'
     execute_on = 'nonlinear'
     level_set_var = ls_ox_a
-    is_clad = true 
+    is_clad = true
   []
   [velocity_ox_a]
     type = XFEMC4VelocityZrOxA
     value_at_interface_uo = value_uo_ox_a
-    is_clad = true 
+    is_clad = true
   []
   [moving_line_segments_ox_a]
     type = InterfaceMeshCut2DUserObjectZr
-    mesh_file = interface_clad_30deg_2d.e
+    mesh_file = interface_other_curvature_clad_2d.e
     interface_velocity_uo = velocity_ox_a
-    #interface_velocity_function = '-0.1'
-    is_clad = true 
-    clad_rad = 1400
+    #interface_velocity_function = 1
+    #is_clad = true
+    #clad_rad = 1400
     heal_always = true
-    is_C4 = true
-    oxa_interface = true
+    #is_C4 = true
+    #oxa_interface = true
 
   []
+
+  [level_set_cut]
+    type = LevelSetCutUserObject
+    level_set_var = ls_ox_a
+    heal_always = true
+  []
+
   #[value_uo_a_b]
   #  type = NodeValueAtXFEMInterface
   #  variable = 'u'
   #  interface_mesh_cut_userobject = 'moving_line_segments_a_b'
   #  execute_on = 'nonlinear'
   #  level_set_var = ls_a_b
-  #  is_clad = true 
+  #  is_clad = true
   #[]
   #[velocity_a_b]
   #  type = XFEMC4VelocityZrAB
@@ -68,9 +73,9 @@
   #[]
   #[moving_line_segments_a_b]
   #  type = InterfaceMeshCut2DUserObjectZr
-  #  mesh_file = interface_clad_30deg_2d.e 
+  #  mesh_file = interface_clad_30deg_2d.e
   #  interface_velocity_uo = velocity_a_b
-  #  is_clad = true 
+  #  is_clad = true
   #  clad_rad = 1400
   #  heal_always = true
   #  is_C4 = true
@@ -87,8 +92,8 @@
   [ic_u]
     type = C4ZrICConst
     variable = u
-    
-    #is_clad = true 
+
+    #is_clad = true
   []
 []
 
@@ -180,7 +185,7 @@
 []
 
 [BCs]
-# Define boundary conditions
+  # Define boundary conditions
   [left_u]
     type = NeumannBC
     variable = u
@@ -199,7 +204,7 @@
   [position_ox_a]
     type = PositionOfXFEMInterfacePostprocessor
     value_at_interface_uo = value_uo_ox_a
-    execute_on ='timestep_end final'
+    execute_on = 'timestep_end final'
   []
   #[position_a_b]
   #  type = PositionOfXFEMInterfacePostprocessor
@@ -209,7 +214,7 @@
   [oxide_thickness]
     type = OxideThicknessZr
     oxide_alpha_pos = position_ox_a
-    execute_on ='timestep_end final'
+    execute_on = 'timestep_end final'
     is_clad = true
   []
   #[alpha_thickness]
@@ -218,21 +223,21 @@
   #  alpha_beta_pos = position_a_b
   #  execute_on ='timestep_end final'
   #[]
-#  [vacancy_flux]
-#    type = VacancyFluxZrPostprocessor
-#    velocity_uo = velocity_ox_a
-#    execute_on = 'timestep_end final'
-#  []
-#  [vacancy_flux_integral]
-#    type = TotalVariableValue
-#    value = vacancy_flux
-#    execute_on = 'timestep_end final'
-#  []
-#  [weight_gain]
-#    type = WeightGainZr
-#    flux_integral = vacancy_flux_integral
-#    execute_on = 'timestep_end final'
-#  []
+  #  [vacancy_flux]
+  #    type = VacancyFluxZrPostprocessor
+  #    velocity_uo = velocity_ox_a
+  #    execute_on = 'timestep_end final'
+  #  []
+  #  [vacancy_flux_integral]
+  #    type = TotalVariableValue
+  #    value = vacancy_flux
+  #    execute_on = 'timestep_end final'
+  #  []
+  #  [weight_gain]
+  #    type = WeightGainZr
+  #    flux_integral = vacancy_flux_integral
+  #    execute_on = 'timestep_end final'
+  #  []
   [weak_concentration_integral]
     type = ElementIntegralVariablePostprocessor
     variable = u
@@ -241,11 +246,11 @@
   #[weight_gain_space_integral]
   #  type = WeightGainSpaceIntegralCladSlice
   #  concentration_integral = weak_concentration_integral
-  #  angle = 30 
+  #  angle = 30
   #  zmax = 4
   #  oxide_thickness = oxide_thickness
   #  alpha_thickness = alpha_thickness
-  #  oxide_alpha_pos = position_ox_a 
+  #  oxide_alpha_pos = position_ox_a
   #  alpha_beta_pos = position_a_b
   #  execute_on = 'timestep_end final'
   #[]
@@ -282,21 +287,18 @@
   petsc_options_value = 'lu'
   line_search = 'none'
 
-
-
   l_tol = 1e-3
   #l_max_its = 10
   nl_max_its = 15
   nl_rel_tol = 1e-6
   nl_abs_tol = 1e-6
 
-  start_time = 20 
-  dt = 1 
+  start_time = 20
+  dt = 1
   num_steps = 300
   max_xfem_update = 1
 
 []
-
 
 [Outputs]
   execute_on = timestep_end
@@ -308,3 +310,4 @@
   csv = true
   perf_graph = true
 []
+
