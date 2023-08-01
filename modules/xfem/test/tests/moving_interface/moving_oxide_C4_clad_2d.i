@@ -25,7 +25,7 @@
 [XFEM]
   geometric_cut_userobjects = 'moving_line_segments_ox_a'
   qrule = volfrac
-  output_cut_plane = true
+  output_cut_plane = true  #removed in Wen file
 []
 
 [UserObjects]
@@ -44,16 +44,23 @@
   []
   [moving_line_segments_ox_a]
     type = InterfaceMeshCut2DUserObjectZr
-    mesh_file = interface_clad_30deg_2d.e
+    mesh_file = interface_clad_30deg_2d.e    #tried with the velocity interface with biased curvature
     interface_velocity_uo = velocity_ox_a
     #interface_velocity_function = '-0.1'
-    is_clad = true 
+    is_clad = true    #commented out the clad part 
     clad_rad = 1400
     heal_always = true
     is_C4 = true
     oxa_interface = true
-
   []
+  ######
+  #[level_set_cut]
+  #  type = LevelSetCutUSerObject
+  #  level_set_var = ls_ox_a
+  #  heal_always = true 
+  #[]
+  ######
+
   #[value_uo_a_b]
   #  type = NodeValueAtXFEMInterface
   #  variable = 'u'
