@@ -27,7 +27,7 @@
 
 class XFEMMovingInterfaceVelocityBase;
 
-class InterfaceMeshCut2DUserObjectZr : public InterfaceMeshCut2DUserObjectLS
+class InterfaceMeshCut2DUserObjectZr : public InterfaceMeshCut2DUserObject
 {
 public:
   static InputParameters validParams();
