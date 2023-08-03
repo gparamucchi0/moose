@@ -79,7 +79,7 @@ InterfaceMeshCut2DUserObject::cutElementByGeometry(const Elem * elem,
                                                    std::vector<Xfem::CutEdge> & cut_edges,
                                                    std::vector<Xfem::CutNode> & cut_nodes) const
 {
-  //return false; (Wen's modification that should make the problem work ?)
+  //return false; //(Wen's modification that should make the problem work ?) work 
   mooseAssert(elem->dim() == 2, "Dimension of element to be cut must be 2");
 
   bool elem_cut = false;

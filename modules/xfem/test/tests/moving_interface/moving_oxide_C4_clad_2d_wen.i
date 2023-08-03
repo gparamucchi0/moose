@@ -45,11 +45,11 @@
     mesh_file = interface_other_curvature_clad_2d.e
     interface_velocity_uo = velocity_ox_a
     #interface_velocity_function = 1
-    #is_clad = true
-    #clad_rad = 1400
+    is_clad = true
+    clad_rad = 1400
     heal_always = true
-    #is_C4 = true
-    #oxa_interface = true
+    is_C4 = true
+    oxa_interface = true
 
   []
 

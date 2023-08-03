@@ -23,9 +23,9 @@
 []
 
 [XFEM]
-  geometric_cut_userobjects = 'moving_line_segments_ox_a'
+  geometric_cut_userobjects = 'moving_line_segments_ox_a'   #removed in Wen file
   qrule = volfrac
-  output_cut_plane = true  #removed in Wen file
+  output_cut_plane = true 
 []
 
 [UserObjects]
