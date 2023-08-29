@@ -834,7 +834,7 @@ EFAElement2D::updateFragments(const std::set<EFAElement *> & CrackTipElements,
 
   // count fragment's cut edges
   unsigned int num_cut_frag_edges = _fragments[0]->getNumCuts();
-  std::cout << "EFAelem_numfrag : " << num_cut_frag_edges << "; EFAelem_id :" << _id << std::endl;
+  //std::cout << "EFAelem_numfrag : " << num_cut_frag_edges << "; EFAelem_id :" << _id << std::endl;
   unsigned int num_cut_nodes = _fragments[0]->getNumCutNodes();
   unsigned int num_frag_edges = _fragments[0]->numEdges();
   if (num_cut_frag_edges > 3)

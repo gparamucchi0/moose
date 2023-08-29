@@ -151,7 +151,7 @@ InterfaceMeshCut2DUserObjectZr::initialSetup()
       }
       else
       {
-        x_ox_a =0.005591; //591 in 1D centered case and 2d case and 0.005591 in adding Q1d with meca
+        x_ox_a =0.000291; //591 in 1D centered case and 2d case and 0.005591 in adding Q1d with meca
       }
       //Real x_ox_a = 577.9;
       /**      if (MooseUtils::absoluteFuzzyEqual(_temperature,1273.15,1))
