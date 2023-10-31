@@ -20,7 +20,7 @@
                                   #                                         |__|__|__|__|
     [gmg]                         #                                         |__|__|__|__|
         type = FileMeshGenerator  #                                         |__|__|__|__|
-        file = dog_bone_updated.e #imported mesh (0,0) <------ 0.005 ------>|__|__|__|__|(0.0056,0)
+        file = dogbone_old_curv_refined.e #imported mesh (0,0) <------ 0.005 ------>|__|__|__|__|(0.0056,0)
     []
 
     #[top_left_node]
@@ -55,7 +55,7 @@
     [moving_line_segment_ox_a]
         type = InterfaceMeshCut2DUserObjectZr  #Class taking a mesh cutter flat and that position the mesh cutter 
         mesh_file = dog_bone_interface.e        #at the right position depending on the number of phases. 
-        interface_velocity_function = '-3e-6'  #Here we have 1 interface ox/alpha and the velocity is constant
+        interface_velocity_function = '3e-6'  #Here we have 1 interface ox/alpha and the velocity is constant
         heal_always = true
         is_C4 = true 
         oxa_interface = true
@@ -70,7 +70,7 @@
     []
     [ic_u]
         type = ParsedFunction
-        expression = 'if (x>0.005052, 0.0075,0.45)'
+        expression = 'if (x<0.005052, 0.0075,0.45)'
     []
 []
 
