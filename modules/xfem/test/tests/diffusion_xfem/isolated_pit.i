@@ -98,7 +98,7 @@
     value_neighbor = 0
     alpha = 0
     level_set_var = phi
-    use_penalty = false
+    use_penalty = false #P adding
     diff = 0.8102e-5
   []
 []

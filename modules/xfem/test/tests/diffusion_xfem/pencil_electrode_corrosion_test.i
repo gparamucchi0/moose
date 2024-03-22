@@ -93,6 +93,8 @@
     value = 143
     value_neighbor = 5.1
     alpha = 1e6
+    use_penalty = false #GP adding
+    level_set_var = phi #GP adding
   []
 []
 

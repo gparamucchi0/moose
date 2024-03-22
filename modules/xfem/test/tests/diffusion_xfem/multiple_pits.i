@@ -169,6 +169,7 @@
     value_neighbor = 0
     alpha = 1e6
     level_set_var = phi
+    use_penalty = false
   []
   # [u_constraint]
   #   type = XFEMSingleVariableConstraint
