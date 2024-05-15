@@ -77,8 +77,8 @@ ExtendVelocityLevelSetAux::computeValue()
   // Real vel = 0.8102e-5 * _grad_values_positive_level_set_side[index] * _level_set_normal[index] /
   //            (_values_positive_level_set_side[index] - 143.0);
 
-  Real vel = 0.8102e-5 * _grad_values_positive_level_set_side[index] * _level_set_normal[index] /
-             (_values_positive_level_set_side[index] - 143.0);
+  //Real vel = 0.8102e-5 * _grad_values_positive_level_set_side[index] * _level_set_normal[index] /
+  //           (_values_positive_level_set_side[index] - 143.0);
 
   // std::cout << "grad = " << _grad_values_positive_level_set_side[index] << std::endl;
   // std::cout << "normal = " << _level_set_normal[index] << std::endl;

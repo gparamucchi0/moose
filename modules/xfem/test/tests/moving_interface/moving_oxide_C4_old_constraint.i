@@ -2,18 +2,19 @@
 # using the C4 model to compute the growth rate
 # The variable is the reduced concentration [/um^3] over Czr
 # The length unit is the micrometer
-# there's 1 moving interfaces (alpha/oxide)
+# there's 2 moving interfaces (alpha/oxide and alpha/beta)
 # The ICs are set as constants in each phase through ICs, no steady state
 # Temperature dependence is included. No heat equation yet. Homogeneous T.
 
 # if change ix and iy (so dy), must change cut_data in MovingLineSegmentCutSetUO, ymax in weight_gain_space_integral and start/end_point in O_profile vector PP
+
+# Difference with moving_oxide_C4.i is that the constraint has the old formulation to try to remove the velocity bu at the mesh edge
 
 
 [GlobalParams]
   order = FIRST
   family = LAGRANGE
   temperature = 1473.15
-  temperature_neighbor = 1473.15
 []
 
 [Mesh]
@@ -75,13 +76,11 @@
 
 [Constraints]
   [u_constraint_ox_a]
-    type = XFEMEqualValueAtInterfaceC4aox
+    type = XFEMEqualValueAtInterfaceC4aoxOld
     geometric_cut_userobject = 'moving_line_segments_ox_a'
     use_displaced_mesh = false
     variable = u
     alpha = 1e5
-    level_set_var = ls_ox_a
-    use_penalty = false
   []
 []
 
@@ -170,7 +169,7 @@
 
   start_time = -0.5
   dt = 0.5
-  num_steps = 301
+  num_steps = 101
   max_xfem_update = 1
 
 []
